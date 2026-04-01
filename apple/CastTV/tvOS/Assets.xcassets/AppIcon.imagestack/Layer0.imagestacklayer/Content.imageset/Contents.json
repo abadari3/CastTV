@@ -4,6 +4,17 @@
       "filename" : "icon-400.png",
       "idiom" : "tv",
       "scale" : "1x"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "icon-dark-400.png",
+      "idiom" : "tv",
+      "scale" : "1x"
     }
   ],
   "info" : {
