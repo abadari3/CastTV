@@ -7,7 +7,7 @@ import FFmpeg
 /// - SRT (SubRip) → WebVTT
 /// - ASS/SSA → WebVTT (styling stripped, text preserved)
 ///
-/// PGS (bitmap) subtitles are not supported (would require OCR).
+/// For PGS (bitmap) subtitles, use ``PGSExtractor`` instead.
 public enum SubtitleConverter {
 
     public enum ConvertError: LocalizedError, Sendable {

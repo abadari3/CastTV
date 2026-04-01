@@ -54,6 +54,13 @@ final class SegmentStorage: @unchecked Sendable {
         logger.debug("Wrote subtitle \(filename)")
     }
 
+    /// Write a binary file (e.g. PGS subtitle PNG image).
+    func writeBinaryFile(filename: String, data: Data) throws {
+        let path = directory.appendingPathComponent(filename)
+        try data.write(to: path)
+        logger.debug("Wrote \(filename) (\(data.count) bytes)")
+    }
+
     /// Remove segments not in the given set of current indices.
     func cleanupExcept(currentIndices: Set<Int>) {
         lock.lock()

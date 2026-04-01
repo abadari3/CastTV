@@ -1,6 +1,7 @@
 import SwiftUI
 import AVKit
 import CastTVShared
+import UIKit
 
 struct PlayerView: UIViewControllerRepresentable {
     let playMessage: PlayMessage
@@ -20,6 +21,8 @@ struct PlayerView: UIViewControllerRepresentable {
         if context.coordinator.currentURL != playMessage.url {
             loadAndPlay(playMessage, in: vc, coordinator: context.coordinator)
         }
+        // Update PGS overlay when manifest becomes available
+        context.coordinator.updatePGSOverlay(manifest: remuxService.pgsManifest, storageDirectory: remuxService.storageDirectory)
     }
 
     func makeCoordinator() -> Coordinator {
@@ -39,12 +42,14 @@ struct PlayerView: UIViewControllerRepresentable {
         if msg.needsProcessing, let processing = msg.processing {
             // V2: Start remux pipeline and play from local server
             let transcodeAudio = processing.audioTranscode != nil
+            let subtitleFormat = processing.subtitleConvert?.targetFormat ?? "webvtt"
             remuxService.start(
                 sourceURL: msg.url,
                 videoStreamIndex: msg.tracks?.video ?? 0,
                 audioStreamIndex: msg.tracks?.audio ?? 1,
                 subtitleStreamIndex: msg.tracks?.subtitle,
-                transcodeAudio: transcodeAudio
+                transcodeAudio: transcodeAudio,
+                subtitleFormat: subtitleFormat
             )
 
             guard let localURL = remuxService.playbackURL else {
@@ -137,6 +142,9 @@ struct PlayerView: UIViewControllerRepresentable {
         private var bufferEmptyObservation: NSKeyValueObservation?
         private var timeObserverToken: Any?
         private var lastKnownTime: Double = 0
+        // PGS overlay
+        private var pgsOverlayVC: UIHostingController<PGSOverlayView>?
+        private var currentPGSManifest: PGSManifest?
 
         func observePlayer(_ player: AVPlayer, item: AVPlayerItem, url: String) {
             errorObservation?.invalidate()
@@ -213,6 +221,62 @@ struct PlayerView: UIViewControllerRepresentable {
             }
         }
 
+        /// Add or update the PGS bitmap subtitle overlay on the player.
+        func updatePGSOverlay(manifest: PGSManifest?, storageDirectory: URL?) {
+            guard let vc = playerVC, let player = vc.player else { return }
+
+            // Nothing to do if manifest hasn't changed
+            if manifest == nil && currentPGSManifest == nil { return }
+            if manifest != nil && currentPGSManifest != nil { return }
+
+            if let manifest, let dir = storageDirectory {
+                currentPGSManifest = manifest
+
+                // Determine video resolution for coordinate scaling
+                let videoSize: CGSize
+                if let track = player.currentItem?.asset.tracks(withMediaType: .video).first {
+                    videoSize = track.naturalSize
+                } else {
+                    videoSize = CGSize(width: 1920, height: 1080)
+                }
+
+                let overlayView = PGSOverlayView(
+                    manifest: manifest,
+                    storageDirectory: dir,
+                    player: player,
+                    videoSize: videoSize
+                )
+                let hostingVC = UIHostingController(rootView: overlayView)
+                hostingVC.view.backgroundColor = .clear
+                hostingVC.view.isUserInteractionEnabled = false
+
+                // Remove previous overlay if any
+                pgsOverlayVC?.view.removeFromSuperview()
+                pgsOverlayVC?.removeFromParent()
+
+                // Add to contentOverlayView (sits above video, below transport controls)
+                if let overlayContainer = vc.contentOverlayView {
+                    hostingVC.view.translatesAutoresizingMaskIntoConstraints = false
+                    overlayContainer.addSubview(hostingVC.view)
+                    vc.addChild(hostingVC)
+                    NSLayoutConstraint.activate([
+                        hostingVC.view.topAnchor.constraint(equalTo: overlayContainer.topAnchor),
+                        hostingVC.view.bottomAnchor.constraint(equalTo: overlayContainer.bottomAnchor),
+                        hostingVC.view.leadingAnchor.constraint(equalTo: overlayContainer.leadingAnchor),
+                        hostingVC.view.trailingAnchor.constraint(equalTo: overlayContainer.trailingAnchor),
+                    ])
+                    hostingVC.didMove(toParent: vc)
+                    pgsOverlayVC = hostingVC
+                }
+            } else {
+                // Remove overlay
+                pgsOverlayVC?.view.removeFromSuperview()
+                pgsOverlayVC?.removeFromParent()
+                pgsOverlayVC = nil
+                currentPGSManifest = nil
+            }
+        }
+
         @objc private func playerItemFailed(_ notification: Notification) {
             if let error = notification.userInfo?[AVPlayerItemFailedToPlayToEndTimeErrorKey] as? Error {
                 Task { @MainActor [weak self] in
@@ -239,6 +303,8 @@ struct PlayerView: UIViewControllerRepresentable {
             if let token = timeObserverToken, let player = playerVC?.player {
                 player.removeTimeObserver(token)
             }
+            pgsOverlayVC?.view.removeFromSuperview()
+            pgsOverlayVC?.removeFromParent()
             NotificationCenter.default.removeObserver(self)
         }
     }

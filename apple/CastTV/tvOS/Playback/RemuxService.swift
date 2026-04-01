@@ -33,6 +33,7 @@ final class RemuxService: ObservableObject {
     private var currentAudioIndex: Int = 0
     private var currentSubtitleIndex: Int?
     private var currentTranscodeAudio: Bool = false
+    private var currentSubtitleFormat: String = "webvtt"
     private var nextSegmentIndex: Int = 0
 
     /// The URL that AVPlayer should play from.
@@ -46,13 +47,17 @@ final class RemuxService: ObservableObject {
         storage?.directory
     }
 
+    /// Whether PGS bitmap subtitles were extracted and are available for overlay rendering.
+    @Published private(set) var pgsManifest: PGSManifest?
+
     /// Start the remux pipeline for a source URL.
     func start(
         sourceURL: String,
         videoStreamIndex: Int,
         audioStreamIndex: Int,
         subtitleStreamIndex: Int? = nil,
-        transcodeAudio: Bool = false
+        transcodeAudio: Bool = false,
+        subtitleFormat: String = "webvtt"
     ) {
         stop()
 
@@ -62,6 +67,7 @@ final class RemuxService: ObservableObject {
         currentAudioIndex = audioStreamIndex
         currentSubtitleIndex = subtitleStreamIndex
         currentTranscodeAudio = transcodeAudio
+        currentSubtitleFormat = subtitleFormat
         nextSegmentIndex = 0
         logger.notice("Starting remux: \(sourceURL) (video=\(videoStreamIndex), audio=\(audioStreamIndex), transcode=\(transcodeAudio))")
 
@@ -97,11 +103,38 @@ final class RemuxService: ObservableObject {
             if let subIndex = subtitleStreamIndex {
                 let srcURL = sourceURL
                 let stor = storage
-                Task.detached {
+                let subFmt = subtitleFormat
+                Task.detached { [weak self] in
                     do {
-                        let vtt = try SubtitleConverter.convert(sourceURL: srcURL, streamIndex: subIndex)
-                        try stor.writeSubtitle(filename: "subtitles.vtt", content: vtt)
-                        logger.notice("Subtitles converted (\(vtt.count) chars)")
+                        if subFmt == "pgs_images" {
+                            let events = try PGSExtractor.extract(sourceURL: srcURL, streamIndex: subIndex)
+                            var manifestEntries: [PGSManifest.Entry] = []
+
+                            for (i, event) in events.enumerated() {
+                                let filename = "pgs_\(i).png"
+                                try stor.writeBinaryFile(filename: filename, data: event.pngData)
+                                manifestEntries.append(PGSManifest.Entry(
+                                    index: i,
+                                    start: event.start,
+                                    end: event.end,
+                                    x: event.x,
+                                    y: event.y,
+                                    width: event.width,
+                                    height: event.height,
+                                    filename: filename
+                                ))
+                            }
+
+                            let manifest = PGSManifest(entries: manifestEntries)
+                            logger.notice("PGS subtitles extracted: \(events.count) bitmaps")
+                            await MainActor.run { [weak self] in
+                                self?.pgsManifest = manifest
+                            }
+                        } else {
+                            let vtt = try SubtitleConverter.convert(sourceURL: srcURL, streamIndex: subIndex)
+                            try stor.writeSubtitle(filename: "subtitles.vtt", content: vtt)
+                            logger.notice("Subtitles converted (\(vtt.count) chars)")
+                        }
                     } catch {
                         logger.error("Subtitle conversion failed: \(error)")
                     }
@@ -172,6 +205,7 @@ final class RemuxService: ObservableObject {
         state = .idle
         progressSeconds = 0
         totalSeconds = nil
+        pgsManifest = nil
         currentSourceURL = nil
         nextSegmentIndex = 0
     }
