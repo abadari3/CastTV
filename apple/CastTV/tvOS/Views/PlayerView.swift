@@ -40,6 +40,20 @@ struct PlayerView: UIViewControllerRepresentable {
         let playbackURL: URL
 
         if msg.needsProcessing, let processing = msg.processing {
+            // Check if only PGS subtitle extraction is needed (no remux, no audio transcode)
+            let pgsOnly = !processing.remux
+                && processing.audioTranscode == nil
+                && processing.subtitleConvert?.targetFormat == "pgs_images"
+
+            if pgsOnly, let subIndex = msg.tracks?.subtitle {
+                // Play original URL directly, extract PGS in background
+                playbackURL = sourceURL
+                remuxService.extractPGSOnly(sourceURL: msg.url, subtitleStreamIndex: subIndex)
+                CastTVLogger.shared.info("PGS-only mode: playing directly with bitmap overlay")
+                startPlayback(vc: vc, url: playbackURL, coordinator: coordinator, msg: msg)
+                return
+            }
+
             // V2: Start remux pipeline and play from local server
             let transcodeAudio = processing.audioTranscode != nil
             let subtitleFormat = processing.subtitleConvert?.targetFormat ?? "webvtt"

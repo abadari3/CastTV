@@ -17,6 +17,18 @@ struct PGSManifest: Sendable {
 
     let entries: [Entry]
 
+    /// Create a manifest from unsorted entries, sorting by start time and re-indexing.
+    init(unsortedEntries: [Entry]) {
+        var sorted = unsortedEntries.sorted { $0.start < $1.start }
+        for i in sorted.indices {
+            let e = sorted[i]
+            sorted[i] = Entry(index: i, start: e.start, end: e.end,
+                              x: e.x, y: e.y, width: e.width, height: e.height,
+                              filename: e.filename)
+        }
+        self.entries = sorted
+    }
+
     /// Find the entry that should be displayed at the given playback time.
     /// Returns nil if no subtitle should be visible.
     func entry(at time: Double) -> Entry? {
