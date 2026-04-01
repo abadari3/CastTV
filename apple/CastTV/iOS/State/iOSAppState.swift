@@ -27,6 +27,10 @@ final class iOSAppState: ObservableObject {
         startBrowsing()
     }
 
+    deinit {
+        browseTask?.cancel()
+    }
+
     func loadDevices() {
         pairedDevices = storage.loadDevices()
     }
