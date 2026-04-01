@@ -6,8 +6,9 @@ private let logger = Logger(subsystem: "com.casttv.shared", category: "BonjourAd
 
 /// Advertises this TV on the local network via Bonjour so iPhones can discover it.
 ///
-/// Publishes a `_casttv._tcp` service with the room code and encryption key in TXT records,
-/// allowing nearby iPhones to auto-connect without scanning a QR code.
+/// Publishes a `_casttv._tcp` service with the room code and device name in TXT records.
+/// The encryption key is NOT broadcast — it must be exchanged via QR code for security.
+/// Bonjour enables auto-reconnect for already-paired devices and discovery of new TVs.
 public final class BonjourAdvertiser: @unchecked Sendable {
 
     public static let serviceType = "_casttv._tcp"
@@ -21,20 +22,18 @@ public final class BonjourAdvertiser: @unchecked Sendable {
         stop()
     }
 
-    /// Start advertising the given room code and encryption key on the local network.
-    public func start(roomCode: String, keyBase64URL: String, deviceName: String) {
+    /// Start advertising the given room code on the local network.
+    /// Only the room code and device name are broadcast — the encryption key
+    /// is never sent over mDNS to avoid passive interception on shared networks.
+    public func start(roomCode: String, deviceName: String) {
         stop()
 
         do {
-            let listener = try NWListener(service: .init(
-                name: "CastTV-\(roomCode)",
-                type: Self.serviceType
-            ), using: .tcp)
+            let listener = try NWListener(using: .tcp)
 
-            // Encode pairing data in TXT record
+            // Encode discovery data in TXT record (no encryption key!)
             let txtRecord = NWTXTRecord([
                 "room": roomCode,
-                "key": keyBase64URL,
                 "name": deviceName
             ])
             listener.service = NWListener.Service(
@@ -62,9 +61,10 @@ public final class BonjourAdvertiser: @unchecked Sendable {
                 connection.cancel()
             }
 
-            listener.start(queue: .global(qos: .utility))
-
+            // Store under lock BEFORE starting to avoid race with stop()
             lock.withLock { _listener = listener }
+
+            listener.start(queue: .global(qos: .utility))
             logger.notice("Bonjour advertiser configured for room \(roomCode)")
 
         } catch {

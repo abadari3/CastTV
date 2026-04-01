@@ -8,13 +8,11 @@ private let logger = Logger(subsystem: "com.casttv.shared", category: "BonjourBr
 public struct DiscoveredTV: Identifiable, Equatable, Hashable, Sendable {
     public let id: String // service name
     public let roomCode: String
-    public let keyBase64URL: String
     public let deviceName: String
 
-    public init(id: String, roomCode: String, keyBase64URL: String, deviceName: String) {
+    public init(id: String, roomCode: String, deviceName: String) {
         self.id = id
         self.roomCode = roomCode
-        self.keyBase64URL = keyBase64URL
         self.deviceName = deviceName
     }
 }
@@ -22,7 +20,8 @@ public struct DiscoveredTV: Identifiable, Equatable, Hashable, Sendable {
 /// Browses the local network for CastTV services advertised by TV apps.
 ///
 /// Uses `NWBrowser` to discover `_casttv._tcp` Bonjour services and extracts
-/// room code + encryption key from TXT records for quick-connect pairing.
+/// room code + device name from TXT records. The encryption key is NOT available
+/// via Bonjour — first-time pairing still requires a QR code scan.
 public final class BonjourBrowser: @unchecked Sendable {
 
     private let lock = NSLock()
@@ -33,6 +32,8 @@ public final class BonjourBrowser: @unchecked Sendable {
     private let discoveredContinuation: AsyncStream<[DiscoveredTV]>.Continuation
 
     /// Stream of currently discovered TVs, updated as services appear/disappear.
+    /// Note: `AsyncStream` supports only a single consumer. If multiple observers
+    /// are needed, use `currentDiscoveries` for snapshot access instead.
     public var discoveries: AsyncStream<[DiscoveredTV]> { discoveredStream }
 
     /// Current snapshot of discovered TVs.
@@ -88,9 +89,9 @@ public final class BonjourBrowser: @unchecked Sendable {
         }
         browser?.cancel()
 
-        lock.lock()
-        _discovered.removeAll()
-        lock.unlock()
+        lock.withLock {
+            _discovered.removeAll()
+        }
     }
 
     private func handleResults(_ results: Set<NWBrowser.Result>) {
@@ -103,7 +104,6 @@ public final class BonjourBrowser: @unchecked Sendable {
             // Extract TXT record metadata
             if case .bonjour(let txtRecord) = result.metadata {
                 guard let roomCode = txtRecord["room"],
-                      let key = txtRecord["key"],
                       let deviceName = txtRecord["name"] else {
                     logger.warning("Bonjour service \(name) missing required TXT fields")
                     continue
@@ -112,17 +112,16 @@ public final class BonjourBrowser: @unchecked Sendable {
                 let tv = DiscoveredTV(
                     id: name,
                     roomCode: roomCode,
-                    keyBase64URL: key,
                     deviceName: deviceName
                 )
                 newDiscovered[name] = tv
             }
         }
 
-        lock.lock()
-        _discovered = newDiscovered
+        lock.withLock {
+            _discovered = newDiscovered
+        }
         let snapshot = Array(newDiscovered.values)
-        lock.unlock()
 
         logger.notice("Discovered \(snapshot.count) TV(s) on local network")
         discoveredContinuation.yield(snapshot)

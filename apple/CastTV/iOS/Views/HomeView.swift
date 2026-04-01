@@ -25,13 +25,13 @@ struct HomeView: View {
                             NearbyTVRow(tv: tv)
                                 .contentShape(Rectangle())
                                 .onTapGesture {
-                                    appState.quickConnect(to: tv)
+                                    appState.startScanning()
                                 }
                         }
                     } header: {
                         Label("Nearby TVs", systemImage: "wifi")
                     } footer: {
-                        Text("Tap to pair automatically")
+                        Text("Tap to scan the QR code on your TV and pair")
                     }
                 }
 
@@ -43,7 +43,11 @@ struct HomeView: View {
                     )
                 } else if !appState.pairedDevices.isEmpty {
                     ForEach(appState.pairedDevices) { device in
-                        DeviceRow(device: device, isOnline: appState.isOnline(device))
+                        DeviceRow(
+                            device: device,
+                            isOnline: appState.isOnline(device),
+                            isNearby: appState.isNearby(device)
+                        )
                             .contentShape(Rectangle())
                             .onTapGesture {
                                 if appState.isOnline(device) {
@@ -73,7 +77,7 @@ struct HomeView: View {
                                 }
                             }
                     }
-                }  // end else if pairedDevices
+                }
             }
             .refreshable {
                 await appState.checkAllStatus()
@@ -191,7 +195,7 @@ private struct NearbyTVRow: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            Image(systemName: "wifi")
+            Image(systemName: "tv.badge.wifi")
                 .font(.subheadline)
                 .foregroundStyle(.blue)
 
@@ -206,7 +210,7 @@ private struct NearbyTVRow: View {
 
             Spacer()
 
-            Text("Connect")
+            Text("Scan QR to Pair")
                 .font(.subheadline)
                 .foregroundStyle(.blue)
         }

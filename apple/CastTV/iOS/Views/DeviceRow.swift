@@ -4,6 +4,7 @@ import CastTVShared
 struct DeviceRow: View {
     let device: PairedDevice
     let isOnline: Bool
+    var isNearby: Bool = false
 
     var body: some View {
         HStack(spacing: 12) {
@@ -16,8 +17,16 @@ struct DeviceRow: View {
                 .foregroundStyle(.secondary)
 
             VStack(alignment: .leading, spacing: 4) {
-                Text(device.name)
-                    .font(.headline)
+                HStack(spacing: 6) {
+                    Text(device.name)
+                        .font(.headline)
+
+                    if isNearby {
+                        Image(systemName: "wifi")
+                            .font(.caption2)
+                            .foregroundStyle(.blue)
+                    }
+                }
 
                 HStack(spacing: 12) {
                     if let caps = device.capabilities {
