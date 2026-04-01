@@ -1,50 +1,16 @@
-name: Build & Deploy
+name: Build Apple
 
 on:
   push:
     tags: ['v*']
+  workflow_dispatch:
 
 jobs:
-  deploy-worker:
-    name: Deploy Worker
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install dependencies
-        working-directory: worker
-        run: npm ci
-
-      - name: Deploy
-        working-directory: worker
-        run: npx wrangler deploy
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-
-  build-android:
-    name: Build Android APK
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: 17
-
-      - name: Build APK
-        working-directory: android
-        run: ./gradlew assembleRelease
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: android-apk
-          path: android/app/build/outputs/apk/release/*.apk
-
-  build-apple:
+  build:
     name: Build iOS & tvOS
     runs-on: macos-15
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
 
@@ -108,42 +74,10 @@ jobs:
           zip -r CastTV-tvOS.ipa Payload
           rm -rf Payload
 
-      - name: Upload IPAs
-        uses: actions/upload-artifact@v4
-        with:
-          name: apple-ipas
-          path: |
-            CastTV-iOS.ipa
-            CastTV-tvOS.ipa
-
-  release:
-    name: Create Release
-    runs-on: ubuntu-latest
-    needs: [deploy-worker, build-android, build-apple]
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Download Android APK
-        uses: actions/download-artifact@v4
-        with:
-          name: android-apk
-          path: artifacts
-
-      - name: Download Apple IPAs
-        uses: actions/download-artifact@v4
-        with:
-          name: apple-ipas
-          path: artifacts
-
-      - name: Create Release
+      - name: Upload IPAs to release
+        if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
         with:
-          name: ${{ github.ref_name }}
-          body: |
-            **Artifacts:**
-            - `CastTV-iOS.ipa` — unsigned iOS app
-            - `CastTV-tvOS.ipa` — unsigned tvOS app
-            - `*.apk` — Android TV app
-          files: artifacts/*
+          files: |
+            CastTV-iOS.ipa
+            CastTV-tvOS.ipa
