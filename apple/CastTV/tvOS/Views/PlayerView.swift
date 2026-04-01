@@ -47,10 +47,9 @@ struct PlayerView: UIViewControllerRepresentable {
 
             if pgsOnly, let subIndex = msg.tracks?.subtitle {
                 // Play original URL directly, extract PGS in background
-                playbackURL = sourceURL
                 remuxService.extractPGSOnly(sourceURL: msg.url, subtitleStreamIndex: subIndex)
                 CastTVLogger.shared.info("PGS-only mode: playing directly with bitmap overlay")
-                startPlayback(vc: vc, url: playbackURL, coordinator: coordinator, msg: msg)
+                startPlayback(vc: vc, url: sourceURL, coordinator: coordinator, msg: msg)
                 return
             }
 
@@ -130,7 +129,10 @@ struct PlayerView: UIViewControllerRepresentable {
             vc.player = player
         }
 
-        coordinator.isRemuxed = msg.needsProcessing
+        // isRemuxed drives seek-beyond-buffer detection for the remux pipeline.
+        // PGS-only mode plays directly and doesn't use the remux pipeline.
+        let isPGSOnly = msg.processing.map { !$0.remux && $0.audioTranscode == nil && $0.subtitleConvert?.targetFormat == "pgs_images" } ?? false
+        coordinator.isRemuxed = msg.needsProcessing && !isPGSOnly
         coordinator.observePlayer(vc.player!, item: item, url: msg.url)
 
         // Resume: seek to saved position

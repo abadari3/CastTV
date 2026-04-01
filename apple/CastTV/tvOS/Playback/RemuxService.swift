@@ -104,40 +104,17 @@ final class RemuxService: ObservableObject {
                 let srcURL = sourceURL
                 let stor = storage
                 let subFmt = subtitleFormat
-                Task.detached { [weak self] in
-                    do {
-                        if subFmt == "pgs_images" {
-                            var manifestEntries: [PGSManifest.Entry] = []
-                            var eventIndex = 0
-
-                            try PGSExtractor.extractStreaming(sourceURL: srcURL, streamIndex: subIndex) { event in
-                                let filename = "pgs_\(eventIndex).png"
-                                try stor.writeBinaryFile(filename: filename, data: event.pngData)
-                                manifestEntries.append(PGSManifest.Entry(
-                                    index: eventIndex,
-                                    start: event.start,
-                                    end: event.end,
-                                    x: event.x,
-                                    y: event.y,
-                                    width: event.width,
-                                    height: event.height,
-                                    filename: filename
-                                ))
-                                eventIndex += 1
-                            }
-
-                            let manifest = PGSManifest(unsortedEntries: manifestEntries)
-                            logger.notice("PGS subtitles extracted: \(eventIndex) bitmaps")
-                            await MainActor.run { [weak self] in
-                                self?.pgsManifest = manifest
-                            }
-                        } else {
+                if subFmt == "pgs_images" {
+                    launchPGSExtraction(sourceURL: srcURL, streamIndex: subIndex, storage: stor)
+                } else {
+                    Task.detached {
+                        do {
                             let vtt = try SubtitleConverter.convert(sourceURL: srcURL, streamIndex: subIndex)
                             try stor.writeSubtitle(filename: "subtitles.vtt", content: vtt)
                             logger.notice("Subtitles converted (\(vtt.count) chars)")
+                        } catch {
+                            logger.error("Subtitle conversion failed: \(error)")
                         }
-                    } catch {
-                        logger.error("Subtitle conversion failed: \(error)")
                     }
                 }
             }
@@ -158,43 +135,10 @@ final class RemuxService: ObservableObject {
     /// Extract PGS subtitles without starting the full remux pipeline.
     /// Use this when the video can play directly but PGS subtitles need extraction.
     func extractPGSOnly(sourceURL: String, subtitleStreamIndex: Int) {
-        // Only need storage for PGS PNG files — no server, no remuxer
         do {
             let storage = try SegmentStorage()
             self.storage = storage
-
-            let srcURL = sourceURL
-            let stor = storage
-            Task.detached { [weak self] in
-                do {
-                    var manifestEntries: [PGSManifest.Entry] = []
-                    var eventIndex = 0
-
-                    try PGSExtractor.extractStreaming(sourceURL: srcURL, streamIndex: subtitleStreamIndex) { event in
-                        let filename = "pgs_\(eventIndex).png"
-                        try stor.writeBinaryFile(filename: filename, data: event.pngData)
-                        manifestEntries.append(PGSManifest.Entry(
-                            index: eventIndex,
-                            start: event.start,
-                            end: event.end,
-                            x: event.x,
-                            y: event.y,
-                            width: event.width,
-                            height: event.height,
-                            filename: filename
-                        ))
-                        eventIndex += 1
-                    }
-
-                    let manifest = PGSManifest(unsortedEntries: manifestEntries)
-                    logger.notice("PGS-only extraction complete: \(eventIndex) bitmaps")
-                    await MainActor.run { [weak self] in
-                        self?.pgsManifest = manifest
-                    }
-                } catch {
-                    logger.error("PGS-only extraction failed: \(error)")
-                }
-            }
+            launchPGSExtraction(sourceURL: sourceURL, streamIndex: subtitleStreamIndex, storage: storage)
         } catch {
             logger.error("Failed to create storage for PGS extraction: \(error)")
         }
@@ -212,8 +156,8 @@ final class RemuxService: ObservableObject {
         remuxTask = nil
         remuxer = nil
 
-        // Clean segment files so FFmpeg starts fresh
-        storage?.removeAll()
+        // Clean HLS files so FFmpeg starts fresh, but preserve PGS subtitle images
+        storage?.removeHLSFiles()
 
         guard let storage else { return }
 
@@ -254,6 +198,45 @@ final class RemuxService: ObservableObject {
         pgsManifest = nil
         currentSourceURL = nil
         nextSegmentIndex = 0
+    }
+
+    // MARK: - PGS Extraction
+
+    /// Run PGS extraction on a background thread, writing PNGs to storage
+    /// and publishing the manifest on the main actor when complete.
+    private func launchPGSExtraction(sourceURL: String, streamIndex: Int, storage: SegmentStorage) {
+        let srcURL = sourceURL
+        let stor = storage
+        Task.detached { [weak self] in
+            do {
+                var manifestEntries: [PGSManifest.Entry] = []
+                var eventIndex = 0
+
+                try PGSExtractor.extractStreaming(sourceURL: srcURL, streamIndex: streamIndex) { event in
+                    let filename = "pgs_\(eventIndex).png"
+                    try stor.writeBinaryFile(filename: filename, data: event.pngData)
+                    manifestEntries.append(PGSManifest.Entry(
+                        index: eventIndex,
+                        start: event.start,
+                        end: event.end,
+                        x: event.x,
+                        y: event.y,
+                        width: event.width,
+                        height: event.height,
+                        filename: filename
+                    ))
+                    eventIndex += 1
+                }
+
+                let manifest = PGSManifest(unsortedEntries: manifestEntries)
+                logger.notice("PGS subtitles extracted: \(eventIndex) bitmaps")
+                await MainActor.run { [weak self] in
+                    self?.pgsManifest = manifest
+                }
+            } catch {
+                logger.error("PGS extraction failed: \(error)")
+            }
+        }
     }
 
     // MARK: - Callbacks

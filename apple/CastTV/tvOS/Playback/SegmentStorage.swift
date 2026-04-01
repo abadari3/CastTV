@@ -84,8 +84,9 @@ final class SegmentStorage: @unchecked Sendable {
         }
     }
 
-    /// Remove all files and reset.
-    func removeAll() {
+    /// Remove HLS segment and playlist files, preserving PGS subtitle images.
+    /// Used during seek to let FFmpeg start fresh without losing extracted subtitles.
+    func removeHLSFiles() {
         lock.lock()
         let allFiles = segmentFiles
         segmentFiles.removeAll()
@@ -96,13 +97,25 @@ final class SegmentStorage: @unchecked Sendable {
             try? FileManager.default.removeItem(at: path)
         }
 
-        // Also remove any subtitle files
+        // Remove playlist files
+        let playlistPath = directory.appendingPathComponent("stream.m3u8")
+        try? FileManager.default.removeItem(at: playlistPath)
+
+        logger.notice("Removed HLS segments and playlists")
+    }
+
+    /// Remove all files (segments, subtitles, PGS images) and reset.
+    func removeAll() {
+        lock.lock()
+        segmentFiles.removeAll()
+        lock.unlock()
+
         if let contents = try? FileManager.default.contentsOfDirectory(at: directory, includingPropertiesForKeys: nil) {
             for url in contents {
                 try? FileManager.default.removeItem(at: url)
             }
         }
 
-        logger.notice("Removed all segments")
+        logger.notice("Removed all files")
     }
 }
