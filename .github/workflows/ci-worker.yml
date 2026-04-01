@@ -1,0 +1,24 @@
+name: CI Worker
+
+on:
+  push:
+    branches: ['**']
+    paths:
+      - 'worker/**'
+      - '.github/workflows/ci-worker.yml'
+  pull_request:
+    paths:
+      - 'worker/**'
+      - '.github/workflows/ci-worker.yml'
+  workflow_call:
+
+jobs:
+  build:
+    name: Check Worker
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        working-directory: worker
+        run: npm ci

@@ -6,8 +6,13 @@ on:
   workflow_dispatch:
 
 jobs:
+  ci:
+    name: CI
+    uses: ./.github/workflows/ci-worker.yml
+
   deploy:
-    name: Deploy Worker
+    name: Deploy
+    needs: ci
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

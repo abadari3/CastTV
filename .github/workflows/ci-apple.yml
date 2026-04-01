@@ -1,16 +1,23 @@
-name: Build Apple
+name: CI Apple
 
 on:
   push:
-    tags: ['v*']
-  workflow_dispatch:
+    branches: ['**']
+    paths:
+      - 'apple/**'
+      - 'scripts/build-ffmpeg.sh'
+      - '.github/workflows/ci-apple.yml'
+  pull_request:
+    paths:
+      - 'apple/**'
+      - 'scripts/build-ffmpeg.sh'
+      - '.github/workflows/ci-apple.yml'
+  workflow_call:
 
 jobs:
   build:
     name: Build iOS & tvOS
     runs-on: macos-15
-    permissions:
-      contents: write
     steps:
       - uses: actions/checkout@v4
 
@@ -45,14 +52,6 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO
 
-      - name: Package iOS IPA
-        run: |
-          APP_PATH=$(find apple/CastTV/build/DerivedData-iOS -name "CastTV.app" -path "*/Release-iphoneos/*" | head -1)
-          mkdir -p Payload
-          cp -r "$APP_PATH" Payload/
-          zip -r CastTV-iOS.ipa Payload
-          rm -rf Payload
-
       - name: Build tvOS
         working-directory: apple/CastTV
         run: |
@@ -65,19 +64,3 @@ jobs:
             CODE_SIGN_IDENTITY=- \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO
-
-      - name: Package tvOS IPA
-        run: |
-          APP_PATH=$(find apple/CastTV/build/DerivedData-tvOS -name "CastTV.app" -path "*/Release-appletvos/*" | head -1)
-          mkdir -p Payload
-          cp -r "$APP_PATH" Payload/
-          zip -r CastTV-tvOS.ipa Payload
-          rm -rf Payload
-
-      - name: Upload IPAs to release
-        if: startsWith(github.ref, 'refs/tags/v')
-        uses: softprops/action-gh-release@v2
-        with:
-          files: |
-            CastTV-iOS.ipa
-            CastTV-tvOS.ipa
