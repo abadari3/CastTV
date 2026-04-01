@@ -14,18 +14,12 @@ android {
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
+        setProperty("archivesBaseName", "CastTV-AndroidTV")
     }
 
     buildTypes {
         release {
             isMinifyEnabled = false
-        }
-    }
-
-    applicationVariants.all {
-        outputs.all {
-            val output = this as com.android.build.gradle.internal.api.BaseVariantOutputImpl
-            output.outputFileName = "CastTV-AndroidTV.apk"
         }
     }
 
