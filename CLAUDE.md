@@ -17,7 +17,7 @@ iPhone (iOS)  ──WebSocket──▶  Cloudflare Worker (relay)  ◀──WebS
 
 1. TV generates a 6-character room code + AES-256 encryption key
 2. TV encodes both into a QR code: `casttv:<ROOMCODE>:<base64url-key>`
-3. iPhone scans QR (or discovers TV via Bonjour on local network)
+3. iPhone scans QR for key exchange (Bonjour discovers nearby TVs but only shares room code, not the key)
 4. Both connect to the relay's WebSocket at `/room/{CODE}/ws?role=<role>`
 5. All messages are encrypted client-side with AES-256-GCM before sending
 
@@ -48,7 +48,7 @@ See each subdirectory's CLAUDE.md for platform-specific details.
 
 - **Algorithm**: AES-256-GCM (authenticated encryption)
 - **Wire format**: base64(nonce[12] + ciphertext + tag[16])
-- **Key sharing**: Via QR code or Bonjour TXT record (local network only)
+- **Key sharing**: Via QR code only (Bonjour broadcasts room code for discovery, never the key)
 - **Relay is blind**: Worker only sees base64-encoded ciphertext
 
 ## Key Design Decisions

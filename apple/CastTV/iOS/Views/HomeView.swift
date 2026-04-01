@@ -203,7 +203,7 @@ private struct NearbyTVRow: View {
                 Text(tv.deviceName)
                     .font(.headline)
 
-                Text("Room \(tv.roomCode)")
+                Text("Found on local network")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }

@@ -76,8 +76,9 @@ public final class BonjourBrowser: @unchecked Sendable {
             self.handleResults(results)
         }
 
-        browser.start(queue: .global(qos: .utility))
+        // Store under lock BEFORE starting to avoid race with stop()
         lock.withLock { _browser = browser }
+        browser.start(queue: .global(qos: .utility))
     }
 
     /// Stop browsing.

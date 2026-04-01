@@ -44,6 +44,10 @@ final class iOSAppState: ObservableObject {
             guard let self else { return }
             for await discovered in self.bonjourBrowser.discoveries {
                 self.nearbyTVs = discovered
+                // Auto-mark paired nearby devices as online
+                for tv in discovered where self.isAlreadyPaired(tv) {
+                    self.onlineStatus[tv.roomCode] = true
+                }
             }
         }
     }
@@ -51,11 +55,6 @@ final class iOSAppState: ObservableObject {
     /// Whether a discovered TV is already paired.
     func isAlreadyPaired(_ tv: DiscoveredTV) -> Bool {
         pairedDevices.contains { $0.roomCode == tv.roomCode }
-    }
-
-    /// Returns the paired device for a discovered TV, if it exists.
-    func pairedDevice(for tv: DiscoveredTV) -> PairedDevice? {
-        pairedDevices.first { $0.roomCode == tv.roomCode }
     }
 
     /// Whether a paired device was discovered on the local network.
