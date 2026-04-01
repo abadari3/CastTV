@@ -14,15 +14,62 @@ final class iOSAppState: ObservableObject {
     @Published var isPairing: Bool = false
     @Published var pairingError: String?
 
+    // Local network discovery
+    @Published var nearbyTVs: [DiscoveredTV] = []
+    private let bonjourBrowser = BonjourBrowser()
+
     private let storage = PairingStorage.shared
     private var webSocket: WebSocketClient?
+    private var browseTask: Task<Void, Never>?
 
     init() {
         loadDevices()
+        startBrowsing()
     }
 
     func loadDevices() {
         pairedDevices = storage.loadDevices()
+    }
+
+    // MARK: - Local Network Discovery
+
+    private func startBrowsing() {
+        bonjourBrowser.start()
+        browseTask = Task { [weak self] in
+            guard let self else { return }
+            for await discovered in self.bonjourBrowser.discoveries {
+                await MainActor.run {
+                    self.nearbyTVs = discovered
+                }
+            }
+        }
+    }
+
+    /// Quick-connect to a TV discovered on the local network.
+    /// If it's already paired, marks it online. If new, pairs automatically.
+    func quickConnect(to tv: DiscoveredTV) {
+        // Check if this TV is already paired
+        if let existing = pairedDevices.first(where: { $0.roomCode == tv.roomCode }) {
+            // Already paired — just mark online and select
+            onlineStatus[existing.roomCode] = true
+            logger.notice("Quick-connect: already paired to \(tv.deviceName) (room \(tv.roomCode))")
+            return
+        }
+
+        // New TV — pair using the discovered credentials
+        let qrString = "casttv:\(tv.roomCode):\(tv.keyBase64URL)"
+        logger.notice("Quick-connect: pairing with new TV \(tv.deviceName) via Bonjour")
+        handleScannedQR(qrString)
+    }
+
+    /// Whether a discovered TV is already paired.
+    func isAlreadyPaired(_ tv: DiscoveredTV) -> Bool {
+        pairedDevices.contains { $0.roomCode == tv.roomCode }
+    }
+
+    /// Returns the paired device for a discovered TV, if it exists.
+    func pairedDevice(for tv: DiscoveredTV) -> PairedDevice? {
+        pairedDevices.first { $0.roomCode == tv.roomCode }
     }
 
     // MARK: - Online Status
@@ -31,8 +78,16 @@ final class iOSAppState: ObservableObject {
         isCheckingStatus = true
         let devices = pairedDevices
 
+        // Mark devices found via Bonjour as online immediately
+        let nearbyRoomCodes = Set(nearbyTVs.map(\.roomCode))
+
         await withTaskGroup(of: (String, Bool).self) { group in
             for device in devices {
+                // If discovered on local network, it's definitely online
+                if nearbyRoomCodes.contains(device.roomCode) {
+                    onlineStatus[device.roomCode] = true
+                    continue
+                }
                 group.addTask {
                     do {
                         let status = try await RoomStatus.check(

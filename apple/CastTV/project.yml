@@ -28,6 +28,8 @@ targets:
         GENERATE_INFOPLIST_FILE: "YES"
         INFOPLIST_KEY_UILaunchScreen_Generation: "YES"
         INFOPLIST_KEY_NSCameraUsageDescription: "CastTV needs camera access to scan QR codes for pairing with Apple TV"
+        INFOPLIST_KEY_NSLocalNetworkUsageDescription: "CastTV uses the local network to discover nearby TVs for quick pairing"
+        INFOPLIST_KEY_NSBonjourServices: "_casttv._tcp"
 
   CastTV-tvOS:
     type: application
@@ -42,3 +44,5 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.casttv.tvos
         PRODUCT_NAME: CastTV
         GENERATE_INFOPLIST_FILE: "YES"
+        INFOPLIST_KEY_NSLocalNetworkUsageDescription: "CastTV uses the local network to allow iPhones to discover this TV"
+        INFOPLIST_KEY_NSBonjourServices: "_casttv._tcp"
