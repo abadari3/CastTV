@@ -50,7 +50,7 @@ struct PlayerView: UIViewControllerRepresentable {
 
             // V2: Start remux pipeline and play from local server
             let transcodeAudio = processing.audioTranscode != nil
-            let subtitleFormat = processing.subtitleConvert?.targetFormat ?? "webvtt"
+            let subtitleFormat = processing.subtitleConvert?.targetFormat ?? ProcessingRequirements.SubtitleConvertReq.webvtt
             remuxService.start(
                 sourceURL: msg.url,
                 videoStreamIndex: msg.tracks?.video ?? 0,

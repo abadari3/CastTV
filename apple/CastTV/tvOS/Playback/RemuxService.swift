@@ -33,7 +33,7 @@ final class RemuxService: ObservableObject {
     private var currentAudioIndex: Int = 0
     private var currentSubtitleIndex: Int?
     private var currentTranscodeAudio: Bool = false
-    private var currentSubtitleFormat: String = "webvtt"
+    private var currentSubtitleFormat: String = ProcessingRequirements.SubtitleConvertReq.webvtt
     private var nextSegmentIndex: Int = 0
 
     /// The URL that AVPlayer should play from.
@@ -57,7 +57,7 @@ final class RemuxService: ObservableObject {
         audioStreamIndex: Int,
         subtitleStreamIndex: Int? = nil,
         transcodeAudio: Bool = false,
-        subtitleFormat: String = "webvtt"
+        subtitleFormat: String = ProcessingRequirements.SubtitleConvertReq.webvtt
     ) {
         stop()
 
