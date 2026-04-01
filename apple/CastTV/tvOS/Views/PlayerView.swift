@@ -1,6 +1,7 @@
 import SwiftUI
 import AVKit
 import CastTVShared
+import UIKit
 
 struct PlayerView: UIViewControllerRepresentable {
     let playMessage: PlayMessage
@@ -20,6 +21,8 @@ struct PlayerView: UIViewControllerRepresentable {
         if context.coordinator.currentURL != playMessage.url {
             loadAndPlay(playMessage, in: vc, coordinator: context.coordinator)
         }
+        // Update PGS overlay when manifest becomes available
+        context.coordinator.updatePGSOverlay(manifest: remuxService.pgsManifest, storageDirectory: remuxService.storageDirectory)
     }
 
     func makeCoordinator() -> Coordinator {
@@ -37,14 +40,24 @@ struct PlayerView: UIViewControllerRepresentable {
         let playbackURL: URL
 
         if msg.needsProcessing, let processing = msg.processing {
+            if processing.isPGSOnly, let subIndex = msg.tracks?.subtitle {
+                // Play original URL directly, extract PGS in background
+                remuxService.extractPGSOnly(sourceURL: msg.url, subtitleStreamIndex: subIndex)
+                CastTVLogger.shared.info("PGS-only mode: playing directly with bitmap overlay")
+                startPlayback(vc: vc, url: sourceURL, coordinator: coordinator, msg: msg)
+                return
+            }
+
             // V2: Start remux pipeline and play from local server
             let transcodeAudio = processing.audioTranscode != nil
+            let subtitleFormat = processing.subtitleConvert?.targetFormat ?? ProcessingRequirements.SubtitleConvertReq.webvtt
             remuxService.start(
                 sourceURL: msg.url,
                 videoStreamIndex: msg.tracks?.video ?? 0,
                 audioStreamIndex: msg.tracks?.audio ?? 1,
                 subtitleStreamIndex: msg.tracks?.subtitle,
-                transcodeAudio: transcodeAudio
+                transcodeAudio: transcodeAudio,
+                subtitleFormat: subtitleFormat
             )
 
             guard let localURL = remuxService.playbackURL else {
@@ -111,7 +124,9 @@ struct PlayerView: UIViewControllerRepresentable {
             vc.player = player
         }
 
-        coordinator.isRemuxed = msg.needsProcessing
+        // isRemuxed drives seek-beyond-buffer detection for the remux pipeline.
+        // PGS-only mode plays directly and doesn't use the remux pipeline.
+        coordinator.isRemuxed = msg.needsProcessing && !(msg.processing?.isPGSOnly ?? false)
         coordinator.observePlayer(vc.player!, item: item, url: msg.url)
 
         // Resume: seek to saved position
@@ -137,6 +152,12 @@ struct PlayerView: UIViewControllerRepresentable {
         private var bufferEmptyObservation: NSKeyValueObservation?
         private var timeObserverToken: Any?
         private var lastKnownTime: Double = 0
+        // PGS overlay
+        private var pgsOverlayVC: UIHostingController<PGSOverlayView>?
+        private var currentPGSManifest: PGSManifest?
+        private var pgsTimeObserverToken: Any?
+        private var pgsStorageDirectory: URL?
+        private var pgsVideoSize: CGSize = CGSize(width: 1920, height: 1080)
 
         func observePlayer(_ player: AVPlayer, item: AVPlayerItem, url: String) {
             errorObservation?.invalidate()
@@ -213,6 +234,107 @@ struct PlayerView: UIViewControllerRepresentable {
             }
         }
 
+        /// Add or update the PGS bitmap subtitle overlay on the player.
+        func updatePGSOverlay(manifest: PGSManifest?, storageDirectory: URL?) {
+            guard let vc = playerVC, let player = vc.player else { return }
+
+            // Nothing to do if manifest hasn't changed
+            if manifest == nil && currentPGSManifest == nil { return }
+            if manifest != nil && currentPGSManifest != nil { return }
+
+            if let manifest, let dir = storageDirectory {
+                currentPGSManifest = manifest
+                pgsStorageDirectory = dir
+
+                // Detect video size asynchronously, then set up overlay
+                detectVideoSize(player: player) { [weak self] size in
+                    guard let self else { return }
+                    self.pgsVideoSize = size
+                    self.installPGSOverlay(on: vc, player: player, manifest: manifest, dir: dir)
+                }
+            } else {
+                removePGSOverlay()
+            }
+        }
+
+        private func detectVideoSize(player: AVPlayer, completion: @escaping (CGSize) -> Void) {
+            guard let asset = player.currentItem?.asset else {
+                completion(CGSize(width: 1920, height: 1080))
+                return
+            }
+            Task {
+                let fallback = CGSize(width: 1920, height: 1080)
+                do {
+                    let tracks = try await asset.loadTracks(withMediaType: .video)
+                    if let track = tracks.first {
+                        let size = try await track.load(.naturalSize)
+                        await MainActor.run { completion(size) }
+                    } else {
+                        await MainActor.run { completion(fallback) }
+                    }
+                } catch {
+                    await MainActor.run { completion(fallback) }
+                }
+            }
+        }
+
+        private func installPGSOverlay(on vc: AVPlayerViewController, player: AVPlayer, manifest: PGSManifest, dir: URL) {
+            let overlayView = PGSOverlayView(image: nil, entry: nil, videoSize: pgsVideoSize)
+            let hostingVC = UIHostingController(rootView: overlayView)
+            hostingVC.view.backgroundColor = .clear
+            hostingVC.view.isUserInteractionEnabled = false
+
+            // Remove previous overlay if any
+            removePGSOverlay()
+
+            // Add to contentOverlayView (sits above video, below transport controls)
+            guard let overlayContainer = vc.contentOverlayView else { return }
+            hostingVC.view.translatesAutoresizingMaskIntoConstraints = false
+            overlayContainer.addSubview(hostingVC.view)
+            vc.addChild(hostingVC)
+            NSLayoutConstraint.activate([
+                hostingVC.view.topAnchor.constraint(equalTo: overlayContainer.topAnchor),
+                hostingVC.view.bottomAnchor.constraint(equalTo: overlayContainer.bottomAnchor),
+                hostingVC.view.leadingAnchor.constraint(equalTo: overlayContainer.leadingAnchor),
+                hostingVC.view.trailingAnchor.constraint(equalTo: overlayContainer.trailingAnchor),
+            ])
+            hostingVC.didMove(toParent: vc)
+            pgsOverlayVC = hostingVC
+
+            // Start time observer to update subtitle image
+            var currentIndex: Int? = nil
+            let interval = CMTime(seconds: 0.1, preferredTimescale: 600)
+            pgsTimeObserverToken = player.addPeriodicTimeObserver(forInterval: interval, queue: .main) { [weak self, weak hostingVC] time in
+                guard let self, let hostingVC else { return }
+                let seconds = time.seconds
+                guard seconds.isFinite else { return }
+
+                let entry = manifest.entry(at: seconds)
+                if entry?.index != currentIndex {
+                    currentIndex = entry?.index
+                    let image: UIImage?
+                    if let entry {
+                        let path = dir.appendingPathComponent(entry.filename)
+                        image = UIImage(contentsOfFile: path.path)
+                    } else {
+                        image = nil
+                    }
+                    hostingVC.rootView = PGSOverlayView(image: image, entry: entry, videoSize: self.pgsVideoSize)
+                }
+            }
+        }
+
+        private func removePGSOverlay() {
+            if let token = pgsTimeObserverToken, let player = playerVC?.player {
+                player.removeTimeObserver(token)
+                pgsTimeObserverToken = nil
+            }
+            pgsOverlayVC?.view.removeFromSuperview()
+            pgsOverlayVC?.removeFromParent()
+            pgsOverlayVC = nil
+            currentPGSManifest = nil
+        }
+
         @objc private func playerItemFailed(_ notification: Notification) {
             if let error = notification.userInfo?[AVPlayerItemFailedToPlayToEndTimeErrorKey] as? Error {
                 Task { @MainActor [weak self] in
@@ -239,6 +361,11 @@ struct PlayerView: UIViewControllerRepresentable {
             if let token = timeObserverToken, let player = playerVC?.player {
                 player.removeTimeObserver(token)
             }
+            if let token = pgsTimeObserverToken, let player = playerVC?.player {
+                player.removeTimeObserver(token)
+            }
+            pgsOverlayVC?.view.removeFromSuperview()
+            pgsOverlayVC?.removeFromParent()
             NotificationCenter.default.removeObserver(self)
         }
     }

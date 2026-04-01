@@ -109,7 +109,7 @@ public enum CompatibilityEngine {
         case .ass:
             return .needsProcessing("ASS needs conversion to WebVTT (styling will be lost)")
         case .pgs:
-            return .unsupported("PGS bitmap subtitles not supported (requires OCR)")
+            return .needsProcessing("PGS bitmap subtitles rendered as overlay")
         case .unknown:
             return .unsupported("Unknown subtitle format")
         }
@@ -187,7 +187,8 @@ public enum CompatibilityEngine {
            let sub = result.subtitleTracks.first(where: { $0.id == subID }) {
             let subCompat = check(subtitle: sub, capabilities: capabilities)
             if subCompat.isYellow {
-                subtitleConvert = .init(trackId: subID)
+                let targetFmt = sub.format == .pgs ? ProcessingRequirements.SubtitleConvertReq.pgsImages : ProcessingRequirements.SubtitleConvertReq.webvtt
+                subtitleConvert = .init(trackId: subID, targetFormat: targetFmt)
             }
         }
 

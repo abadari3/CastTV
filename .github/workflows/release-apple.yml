@@ -1,0 +1,88 @@
+name: Release Apple
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+jobs:
+  ci:
+    name: CI
+    uses: ./.github/workflows/ci-apple.yml
+
+  release:
+    name: Package & Upload
+    needs: ci
+    runs-on: macos-15
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache FFmpeg xcframework
+        id: cache-ffmpeg
+        uses: actions/cache@v4
+        with:
+          path: apple/FFmpegKit/Frameworks/FFmpeg.xcframework
+          key: ffmpeg-${{ hashFiles('scripts/build-ffmpeg.sh') }}
+
+      - name: Build FFmpeg
+        if: steps.cache-ffmpeg.outputs.cache-hit != 'true'
+        run: ./scripts/build-ffmpeg.sh
+
+      - name: Install xcodegen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        working-directory: apple/CastTV
+        run: xcodegen
+
+      - name: Build iOS
+        working-directory: apple/CastTV
+        run: |
+          xcodebuild build \
+            -project CastTV.xcodeproj \
+            -scheme CastTV-iOS \
+            -configuration Release \
+            -sdk iphoneos \
+            -derivedDataPath build/DerivedData-iOS \
+            CODE_SIGN_IDENTITY=- \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO
+
+      - name: Package iOS IPA
+        run: |
+          APP_PATH=$(find apple/CastTV/build/DerivedData-iOS -name "CastTV.app" -path "*/Release-iphoneos/*" | head -1)
+          mkdir -p Payload
+          cp -r "$APP_PATH" Payload/
+          zip -r CastTV-iOS.ipa Payload
+          rm -rf Payload
+
+      - name: Build tvOS
+        working-directory: apple/CastTV
+        run: |
+          xcodebuild build \
+            -project CastTV.xcodeproj \
+            -scheme CastTV-tvOS \
+            -configuration Release \
+            -sdk appletvos \
+            -derivedDataPath build/DerivedData-tvOS \
+            CODE_SIGN_IDENTITY=- \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO
+
+      - name: Package tvOS IPA
+        run: |
+          APP_PATH=$(find apple/CastTV/build/DerivedData-tvOS -name "CastTV.app" -path "*/Release-appletvos/*" | head -1)
+          mkdir -p Payload
+          cp -r "$APP_PATH" Payload/
+          zip -r CastTV-tvOS.ipa Payload
+          rm -rf Payload
+
+      - name: Upload IPAs to release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            CastTV-iOS.ipa
+            CastTV-tvOS.ipa

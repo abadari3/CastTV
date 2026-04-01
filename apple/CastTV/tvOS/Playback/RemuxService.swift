@@ -33,6 +33,7 @@ final class RemuxService: ObservableObject {
     private var currentAudioIndex: Int = 0
     private var currentSubtitleIndex: Int?
     private var currentTranscodeAudio: Bool = false
+    private var currentSubtitleFormat: String = ProcessingRequirements.SubtitleConvertReq.webvtt
     private var nextSegmentIndex: Int = 0
 
     /// The URL that AVPlayer should play from.
@@ -46,13 +47,17 @@ final class RemuxService: ObservableObject {
         storage?.directory
     }
 
+    /// Whether PGS bitmap subtitles were extracted and are available for overlay rendering.
+    @Published private(set) var pgsManifest: PGSManifest?
+
     /// Start the remux pipeline for a source URL.
     func start(
         sourceURL: String,
         videoStreamIndex: Int,
         audioStreamIndex: Int,
         subtitleStreamIndex: Int? = nil,
-        transcodeAudio: Bool = false
+        transcodeAudio: Bool = false,
+        subtitleFormat: String = ProcessingRequirements.SubtitleConvertReq.webvtt
     ) {
         stop()
 
@@ -62,6 +67,7 @@ final class RemuxService: ObservableObject {
         currentAudioIndex = audioStreamIndex
         currentSubtitleIndex = subtitleStreamIndex
         currentTranscodeAudio = transcodeAudio
+        currentSubtitleFormat = subtitleFormat
         nextSegmentIndex = 0
         logger.notice("Starting remux: \(sourceURL) (video=\(videoStreamIndex), audio=\(audioStreamIndex), transcode=\(transcodeAudio))")
 
@@ -97,13 +103,18 @@ final class RemuxService: ObservableObject {
             if let subIndex = subtitleStreamIndex {
                 let srcURL = sourceURL
                 let stor = storage
-                Task.detached {
-                    do {
-                        let vtt = try SubtitleConverter.convert(sourceURL: srcURL, streamIndex: subIndex)
-                        try stor.writeSubtitle(filename: "subtitles.vtt", content: vtt)
-                        logger.notice("Subtitles converted (\(vtt.count) chars)")
-                    } catch {
-                        logger.error("Subtitle conversion failed: \(error)")
+                let subFmt = subtitleFormat
+                if subFmt == ProcessingRequirements.SubtitleConvertReq.pgsImages {
+                    launchPGSExtraction(sourceURL: srcURL, streamIndex: subIndex, storage: stor)
+                } else {
+                    Task.detached {
+                        do {
+                            let vtt = try SubtitleConverter.convert(sourceURL: srcURL, streamIndex: subIndex)
+                            try stor.writeSubtitle(filename: "subtitles.vtt", content: vtt)
+                            logger.notice("Subtitles converted (\(vtt.count) chars)")
+                        } catch {
+                            logger.error("Subtitle conversion failed: \(error)")
+                        }
                     }
                 }
             }
@@ -121,6 +132,18 @@ final class RemuxService: ObservableObject {
         }
     }
 
+    /// Extract PGS subtitles without starting the full remux pipeline.
+    /// Use this when the video can play directly but PGS subtitles need extraction.
+    func extractPGSOnly(sourceURL: String, subtitleStreamIndex: Int) {
+        do {
+            let storage = try SegmentStorage()
+            self.storage = storage
+            launchPGSExtraction(sourceURL: sourceURL, streamIndex: subtitleStreamIndex, storage: storage)
+        } catch {
+            logger.error("Failed to create storage for PGS extraction: \(error)")
+        }
+    }
+
     /// Seek to a new position during remuxed playback.
     func seekTo(timeSeconds: Double) {
         guard let sourceURL = currentSourceURL, state == .running || state == .finished else { return }
@@ -133,8 +156,8 @@ final class RemuxService: ObservableObject {
         remuxTask = nil
         remuxer = nil
 
-        // Clean segment files so FFmpeg starts fresh
-        storage?.removeAll()
+        // Clean HLS files so FFmpeg starts fresh, but preserve PGS subtitle images
+        storage?.removeHLSFiles()
 
         guard let storage else { return }
 
@@ -172,8 +195,48 @@ final class RemuxService: ObservableObject {
         state = .idle
         progressSeconds = 0
         totalSeconds = nil
+        pgsManifest = nil
         currentSourceURL = nil
         nextSegmentIndex = 0
+    }
+
+    // MARK: - PGS Extraction
+
+    /// Run PGS extraction on a background thread, writing PNGs to storage
+    /// and publishing the manifest on the main actor when complete.
+    private func launchPGSExtraction(sourceURL: String, streamIndex: Int, storage: SegmentStorage) {
+        let srcURL = sourceURL
+        let stor = storage
+        Task.detached { [weak self] in
+            do {
+                var manifestEntries: [PGSManifest.Entry] = []
+                var eventIndex = 0
+
+                try PGSExtractor.extractStreaming(sourceURL: srcURL, streamIndex: streamIndex) { event in
+                    let filename = "pgs_\(eventIndex).png"
+                    try stor.writeBinaryFile(filename: filename, data: event.pngData)
+                    manifestEntries.append(PGSManifest.Entry(
+                        index: eventIndex,
+                        start: event.start,
+                        end: event.end,
+                        x: event.x,
+                        y: event.y,
+                        width: event.width,
+                        height: event.height,
+                        filename: filename
+                    ))
+                    eventIndex += 1
+                }
+
+                let manifest = PGSManifest(unsortedEntries: manifestEntries)
+                logger.notice("PGS subtitles extracted: \(eventIndex) bitmaps")
+                await MainActor.run { [weak self] in
+                    self?.pgsManifest = manifest
+                }
+            } catch {
+                logger.error("PGS extraction failed: \(error)")
+            }
+        }
     }
 
     // MARK: - Callbacks

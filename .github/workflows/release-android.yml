@@ -1,4 +1,4 @@
-name: Build Android
+name: Release Android
 
 on:
   push:
@@ -6,8 +6,13 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
-    name: Build Android APK
+  ci:
+    name: CI
+    uses: ./.github/workflows/ci-android.yml
+
+  release:
+    name: Package & Upload
+    needs: ci
     runs-on: ubuntu-latest
     permissions:
       contents: write

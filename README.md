@@ -32,7 +32,7 @@ worker/
 
 ## Apple TV
 
-Plays content via AVPlayer. For non-native containers (MKV, AVI) or unsupported audio codecs (DTS, TrueHD), runs an on-device FFmpeg pipeline: remux to HLS, transcode audio to AAC, convert subtitles to WebVTT. Serves segments via a local HTTP server. Video is always copied bit-for-bit — never transcoded.
+Plays content via AVPlayer. For non-native containers (MKV, AVI) or unsupported audio codecs (DTS, TrueHD), runs an on-device FFmpeg pipeline: remux to HLS, transcode audio to AAC, convert subtitles to WebVTT. Serves segments via a local HTTP server. Video is always copied bit-for-bit — never transcoded. PGS bitmap subtitles are extracted as timed PNG images and rendered as an overlay on top of the video player.
 
 ## Android TV
 
@@ -89,7 +89,7 @@ Probes URLs (AVFoundation + FFmpeg fallback), shows track info with color-coded 
 | mov_text (tx3g) | Native | Native |
 | SRT | Convert to WebVTT | Native |
 | ASS/SSA | Convert to WebVTT (styling lost) | Native |
-| PGS (bitmap) | Unsupported | Native |
+| PGS (bitmap) | Bitmap overlay | Native |
 
 ### How CastTV compares
 
@@ -116,7 +116,7 @@ Probes URLs (AVFoundation + FFmpeg fallback), shows track info with color-coded 
 | WebVTT / CEA-608 | ✅ | ✅ | ✅ | ✅ | ⚠️ |
 | SRT | 🔄 | ✅ | ❌ | ✅ | ⚠️ |
 | ASS/SSA | 🔄 | ✅ | ❌ | ❌ | ⚠️ |
-| PGS (bitmap) | ❌ | ✅ | ❌ | ❌ | ⚠️ |
+| PGS (bitmap) | 🔄 | ✅ | ❌ | ❌ | ⚠️ |
 | **Features** |
 | E2E encrypted | ✅ | ✅ | ❌ | ❌ | ❌ |
 | No account required | ✅ | ✅ | ❌ | ❌ | ✅ |
