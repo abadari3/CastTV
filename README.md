@@ -44,17 +44,88 @@ Probes URLs (AVFoundation + FFmpeg fallback), shows track info with color-coded 
 
 ## Compatibility
 
-| | Apple TV | Android TV |
-|---|---|---|
-| MP4/MOV/HLS | Native | Native |
-| MKV/WebM/AVI | Remux to HLS | Native |
-| H.264/HEVC | Native | Native |
-| VP9/AV1 | Unsupported | Native |
-| AAC/AC-3/E-AC-3 | Native | Native |
-| DTS/TrueHD/FLAC | Transcode to AAC | Native |
-| WebVTT/CEA-608 | Native | Native |
-| SRT/ASS | Convert to WebVTT | Native |
+### Containers
+
+| Format | Apple TV | Android TV |
+|--------|----------|------------|
+| MP4/MOV/M4V | Native | Native |
+| HLS (.m3u8) | Native | Native |
+| MKV | Remux to HLS | Native |
+| WebM | Remux to HLS | Native |
+| AVI | Remux to HLS | Native |
+
+### Video Codecs
+
+| Codec | Apple TV | Android TV |
+|-------|----------|------------|
+| H.264 | Native | Native |
+| HEVC | Native | Native |
+| HEVC Dolby Vision | Native (tone-mapped if display doesn't support DV) | Native |
+| VP9 | Native (MP4 only) | Native |
+| VP8 | Unsupported | Native |
+| AV1 | Unsupported | Native |
+
+### Audio Codecs
+
+| Codec | Apple TV | Android TV |
+|-------|----------|------------|
+| AAC | Native | Native |
+| MP3 | Native | Native |
+| AC-3 (Dolby Digital) | Native | Native |
+| E-AC-3 (Dolby Digital Plus) | Native | Native |
+| DTS / DTS-HD | Transcode to AAC | Native |
+| TrueHD | Transcode to AAC | Native |
+| FLAC | Transcode to AAC | Native |
+| Opus | Transcode to AAC | Native |
+| Vorbis | Transcode to AAC | Native |
+| PCM | Native | Native |
+
+### Subtitle Formats
+
+| Format | Apple TV | Android TV |
+|--------|----------|------------|
+| WebVTT | Native | Native |
+| CEA-608/708 | Native | Native |
+| mov_text (tx3g) | Native | Native |
+| SRT | Convert to WebVTT | Native |
+| ASS/SSA | Convert to WebVTT (styling lost) | Native |
 | PGS (bitmap) | Unsupported | Native |
+
+### How CastTV compares
+
+| Feature | CastTV (Apple TV) | CastTV (Android TV) | AirPlay | Chromecast | DLNA |
+|---------|-------------------|---------------------|---------|------------|------|
+| **Containers** |
+| MP4/MOV/HLS | ✅ | ✅ | ✅ | ✅ | ✅ |
+| MKV | 🔄 | ✅ | ❌ | ❌ | ⚠️ |
+| WebM | 🔄 | ✅ | ❌ | ✅ | ⚠️ |
+| AVI | 🔄 | ✅ | ❌ | ❌ | ⚠️ |
+| **Video Codecs** |
+| H.264 | ✅ | ✅ | ✅ | ✅ | ✅ |
+| HEVC | ✅ | ✅ | ✅ | ⚠️ | ⚠️ |
+| Dolby Vision | ✅ | ✅ | ✅ | ⚠️ | ⚠️ |
+| VP9 | ✅ (MP4 only) | ✅ | ❌ | ✅ | ⚠️ |
+| AV1 | ❌ | ✅ | ❌ | ✅ | ⚠️ |
+| **Audio Codecs** |
+| AAC / AC-3 / E-AC-3 | ✅ | ✅ | ✅ | ✅ | ✅ |
+| DTS / DTS-HD | 🔄 | ✅ | ❌ | ❌ | ⚠️ |
+| TrueHD / Atmos | 🔄 | ✅ | ❌ | ❌ | ⚠️ |
+| FLAC | 🔄 | ✅ | ✅ | ✅ | ⚠️ |
+| Opus | 🔄 | ✅ | ❌ | ✅ | ⚠️ |
+| **Subtitles** |
+| WebVTT / CEA-608 | ✅ | ✅ | ✅ | ✅ | ⚠️ |
+| SRT | 🔄 | ✅ | ❌ | ✅ | ⚠️ |
+| ASS/SSA | 🔄 | ✅ | ❌ | ❌ | ⚠️ |
+| PGS (bitmap) | ❌ | ✅ | ❌ | ❌ | ⚠️ |
+| **Features** |
+| E2E encrypted | ✅ | ✅ | ❌ | ❌ | ❌ |
+| No account required | ✅ | ✅ | ❌ | ❌ | ✅ |
+| Cross-platform remote | ✅ | ✅ | ❌ | ⚠️ | ⚠️ |
+| Direct URL playback | ✅ | ✅ | ❌ | ❌ | ✅ |
+| On-device remux | ✅ | ❌ (not needed) | ❌ | ❌ | ❌ |
+| Video quality preserved | ✅ | ✅ | ✅ | ⚠️ | ✅ |
+
+✅ Native  🔄 Processed on-device  ⚠️ Varies / partial  ❌ Unsupported
 
 ## Worker
 
