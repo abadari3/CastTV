@@ -107,14 +107,14 @@ final class RemuxService: ObservableObject {
                 Task.detached { [weak self] in
                     do {
                         if subFmt == "pgs_images" {
-                            let events = try PGSExtractor.extract(sourceURL: srcURL, streamIndex: subIndex)
                             var manifestEntries: [PGSManifest.Entry] = []
+                            var eventIndex = 0
 
-                            for (i, event) in events.enumerated() {
-                                let filename = "pgs_\(i).png"
+                            try PGSExtractor.extractStreaming(sourceURL: srcURL, streamIndex: subIndex) { event in
+                                let filename = "pgs_\(eventIndex).png"
                                 try stor.writeBinaryFile(filename: filename, data: event.pngData)
                                 manifestEntries.append(PGSManifest.Entry(
-                                    index: i,
+                                    index: eventIndex,
                                     start: event.start,
                                     end: event.end,
                                     x: event.x,
@@ -123,10 +123,20 @@ final class RemuxService: ObservableObject {
                                     height: event.height,
                                     filename: filename
                                 ))
+                                eventIndex += 1
                             }
 
+                            // Sort by start time since decode order isn't guaranteed
+                            manifestEntries.sort { $0.start < $1.start }
+                            for i in manifestEntries.indices { manifestEntries[i] = PGSManifest.Entry(
+                                index: i, start: manifestEntries[i].start, end: manifestEntries[i].end,
+                                x: manifestEntries[i].x, y: manifestEntries[i].y,
+                                width: manifestEntries[i].width, height: manifestEntries[i].height,
+                                filename: manifestEntries[i].filename
+                            )}
+
                             let manifest = PGSManifest(entries: manifestEntries)
-                            logger.notice("PGS subtitles extracted: \(events.count) bitmaps")
+                            logger.notice("PGS subtitles extracted: \(eventIndex) bitmaps")
                             await MainActor.run { [weak self] in
                                 self?.pgsManifest = manifest
                             }

@@ -45,7 +45,22 @@ public enum PGSExtractor {
 
     /// Extract all PGS subtitle events from a media file.
     /// Returns an array of timed bitmap events sorted by start time.
+    ///
+    /// For lower memory usage on long files, use ``extractStreaming(sourceURL:streamIndex:onEvent:)``
+    /// which delivers events one at a time without accumulating PNG data.
     public static func extract(sourceURL: String, streamIndex: Int) throws -> [PGSEvent] {
+        var events: [PGSEvent] = []
+        try extractStreaming(sourceURL: sourceURL, streamIndex: streamIndex) { event in
+            events.append(event)
+        }
+        events.sort { $0.start < $1.start }
+        return events
+    }
+
+    /// Extract PGS subtitle events one at a time, calling `onEvent` for each.
+    /// This avoids accumulating all PNG data in memory at once.
+    /// Events are delivered in decode order (generally chronological but not guaranteed to be sorted).
+    public static func extractStreaming(sourceURL: String, streamIndex: Int, onEvent: (PGSEvent) throws -> Void) throws {
         avformat_network_init()
 
         var fmtCtx: UnsafeMutablePointer<AVFormatContext>?
@@ -93,8 +108,7 @@ public enum PGSExtractor {
             throw ExtractError.decodeFailed("Failed to open decoder: \(ffmpegError(ret))")
         }
 
-        // Read and decode all PGS subtitle packets
-        var events: [PGSEvent] = []
+        // Read and decode PGS subtitle packets
         var pkt: UnsafeMutablePointer<AVPacket>? = av_packet_alloc()
         defer { av_packet_free(&pkt) }
         guard let p = pkt else {
@@ -156,7 +170,7 @@ public enum PGSExtractor {
                             linesize: linesize,
                             numColors: Int(rect.nb_colors)
                         ) {
-                            events.append(PGSEvent(
+                            try onEvent(PGSEvent(
                                 start: ptsSec,
                                 end: endSec,
                                 pngData: pngData,
@@ -174,9 +188,6 @@ public enum PGSExtractor {
 
             av_packet_unref(p)
         }
-
-        events.sort { $0.start < $1.start }
-        return events
     }
 
     // MARK: - Bitmap Conversion
