@@ -1,0 +1,585 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		056F092A3088E8A8B99A18E6 /* ProbeResultsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 756CB4534698D56AAD50EF6F /* ProbeResultsView.swift */; };
+		086AC875A48522CF56B5BC22 /* iOSAppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 408EEE63380E753EC7A28665 /* iOSAppState.swift */; };
+		18044B3AA1FBD136B2303EBB /* URLEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2E8F13C01467D33AB49B2AE /* URLEntryView.swift */; };
+		189742C37C61A278969B9287 /* HistoryCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5525D8ACA183344D2209EB70 /* HistoryCard.swift */; };
+		21C0EEF8A2A4BD7CBD74BA90 /* ProbeTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = C87C2AEA78C24CB5B3A74855 /* ProbeTest.swift */; };
+		23219F7D7A293B82D57C90F0 /* MediaProber.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CC0FB059CFFA5845719C3F6 /* MediaProber.swift */; };
+		2EA3CEE65EE4A1B4118B89A9 /* CastTVShared in Frameworks */ = {isa = PBXBuildFile; productRef = E388C49872B0EF38F6D6CEB8 /* CastTVShared */; };
+		314FC768970A272E0B2CFBC4 /* LocalServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E197474840F655DB7450E7BF /* LocalServer.swift */; };
+		388B45DDAAB8FC833EC0311C /* PlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56B59DCF9D4DE1DE66EB513A /* PlayerView.swift */; };
+		3F88699D33685C0D901CCAFF /* LogViewerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B4B9870A8F011631524D373 /* LogViewerView.swift */; };
+		4A90CC8181CB5CDFB3B1C22D /* FFmpegKit in Frameworks */ = {isa = PBXBuildFile; productRef = 23F8C8FFEB17FD4E5964AC8A /* FFmpegKit */; };
+		4E51B8A5263052036DD0D8E9 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EE254DE398E5883806D3BCB /* HomeView.swift */; };
+		5858126142DE0CE876BBEE15 /* CastTViOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E77BE75209FB57422E87FFEA /* CastTViOSApp.swift */; };
+		5938A9E11EE518F82E888DF1 /* CapabilityDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E6F6936B7CB9DE37D6187EA /* CapabilityDetector.swift */; };
+		6330011A00F84235893AC409 /* TVAppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72507E7DA214FC88BE156C03 /* TVAppState.swift */; };
+		694DFA7D0FA95B5CBCEC42BD /* QRScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AA83178EFCA3F2DADB030FA /* QRScannerView.swift */; };
+		7D0D2605539D526F48BCB277 /* TVHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 661F1B5B9CEBF625528D07E1 /* TVHomeView.swift */; };
+		A09C4C8C615E0CC640D3A59D /* TVMediaProber.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1A9C4884F35B3CD8FD27E58 /* TVMediaProber.swift */; };
+		A6F0E84C62159FC81DD51D81 /* DirectURLView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E2BCA999FED373A9189F57D /* DirectURLView.swift */; };
+		C1887C4EC32D5CFBAC73533A /* CastTVtvOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB4A7F006F529109048C575B /* CastTVtvOSApp.swift */; };
+		C1F81E69412480ABA205A829 /* DeviceRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35FF36C99838C45DA5EF2DC0 /* DeviceRow.swift */; };
+		C67813000EFCC110221253E8 /* CastTVShared in Frameworks */ = {isa = PBXBuildFile; productRef = 772DFA287ACB53FEFC468CF7 /* CastTVShared */; };
+		D1A55C35F3F4724BBA5571C7 /* RemuxService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5CE08079BB944428C23076F /* RemuxService.swift */; };
+		EC601BD4512D32EE9F911684 /* SegmentStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAFA7E469068E8C54C7A070B /* SegmentStorage.swift */; };
+		F3B59A76D975FA28C2A8DE4B /* FFmpegKit in Frameworks */ = {isa = PBXBuildFile; productRef = 59BE20716648EF11633A5B3A /* FFmpegKit */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		34FBB3442EC12652A4D3049A /* FFmpegKit */ = {isa = PBXFileReference; lastKnownFileType = folder; name = FFmpegKit; path = ../FFmpegKit; sourceTree = SOURCE_ROOT; };
+		35FF36C99838C45DA5EF2DC0 /* DeviceRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceRow.swift; sourceTree = "<group>"; };
+		3CC0FB059CFFA5845719C3F6 /* MediaProber.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaProber.swift; sourceTree = "<group>"; };
+		408EEE63380E753EC7A28665 /* iOSAppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iOSAppState.swift; sourceTree = "<group>"; };
+		5525D8ACA183344D2209EB70 /* HistoryCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryCard.swift; sourceTree = "<group>"; };
+		56B59DCF9D4DE1DE66EB513A /* PlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerView.swift; sourceTree = "<group>"; };
+		5BF556BB3D3B3C310154FB46 /* CastTV-tvOS.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = "CastTV-tvOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		661F1B5B9CEBF625528D07E1 /* TVHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TVHomeView.swift; sourceTree = "<group>"; };
+		6D91040AF8844C19C51B44AD /* CastTV-iOS.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = "CastTV-iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		6E2BCA999FED373A9189F57D /* DirectURLView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DirectURLView.swift; sourceTree = "<group>"; };
+		72507E7DA214FC88BE156C03 /* TVAppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TVAppState.swift; sourceTree = "<group>"; };
+		756CB4534698D56AAD50EF6F /* ProbeResultsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProbeResultsView.swift; sourceTree = "<group>"; };
+		7EE254DE398E5883806D3BCB /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		8E6F6936B7CB9DE37D6187EA /* CapabilityDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapabilityDetector.swift; sourceTree = "<group>"; };
+		9AA83178EFCA3F2DADB030FA /* QRScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRScannerView.swift; sourceTree = "<group>"; };
+		9B4B9870A8F011631524D373 /* LogViewerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogViewerView.swift; sourceTree = "<group>"; };
+		9BBC00FD39C9D4F03C285816 /* CastTVShared */ = {isa = PBXFileReference; lastKnownFileType = folder; name = CastTVShared; path = ../CastTVShared; sourceTree = SOURCE_ROOT; };
+		A1A9C4884F35B3CD8FD27E58 /* TVMediaProber.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TVMediaProber.swift; sourceTree = "<group>"; };
+		BAFA7E469068E8C54C7A070B /* SegmentStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SegmentStorage.swift; sourceTree = "<group>"; };
+		C5CE08079BB944428C23076F /* RemuxService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemuxService.swift; sourceTree = "<group>"; };
+		C87C2AEA78C24CB5B3A74855 /* ProbeTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProbeTest.swift; sourceTree = "<group>"; };
+		D2E8F13C01467D33AB49B2AE /* URLEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLEntryView.swift; sourceTree = "<group>"; };
+		E197474840F655DB7450E7BF /* LocalServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalServer.swift; sourceTree = "<group>"; };
+		E77BE75209FB57422E87FFEA /* CastTViOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CastTViOSApp.swift; sourceTree = "<group>"; };
+		FB4A7F006F529109048C575B /* CastTVtvOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CastTVtvOSApp.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		1038F0404BA62AFADF80AE35 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2EA3CEE65EE4A1B4118B89A9 /* CastTVShared in Frameworks */,
+				4A90CC8181CB5CDFB3B1C22D /* FFmpegKit in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		78C6C603977A95B89567C367 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C67813000EFCC110221253E8 /* CastTVShared in Frameworks */,
+				F3B59A76D975FA28C2A8DE4B /* FFmpegKit in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		0839CC1C3E12DB06E353B4BA /* State */ = {
+			isa = PBXGroup;
+			children = (
+				408EEE63380E753EC7A28665 /* iOSAppState.swift */,
+			);
+			path = State;
+			sourceTree = "<group>";
+		};
+		0B54BDB03BD2EC3D5788EA02 /* Media */ = {
+			isa = PBXGroup;
+			children = (
+				8E6F6936B7CB9DE37D6187EA /* CapabilityDetector.swift */,
+				A1A9C4884F35B3CD8FD27E58 /* TVMediaProber.swift */,
+			);
+			path = Media;
+			sourceTree = "<group>";
+		};
+		0E95E2AA90A815F36923E5D3 /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				E77BE75209FB57422E87FFEA /* CastTViOSApp.swift */,
+				4F4344D984CDF3716D557E96 /* Debug */,
+				6C532EAFE4211DD97AF7D6E9 /* Media */,
+				0839CC1C3E12DB06E353B4BA /* State */,
+				9DA5C32FA96D7142AFB0AB49 /* Views */,
+			);
+			path = iOS;
+			sourceTree = "<group>";
+		};
+		2776F96A6DD39369EA2FEBDE = {
+			isa = PBXGroup;
+			children = (
+				0E95E2AA90A815F36923E5D3 /* iOS */,
+				7325984FAE0320E5ADEE2CBC /* Packages */,
+				647EADB8CA6E28200F1CBBFE /* tvOS */,
+				513001CAADEF0F05709729E7 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		4698E1F1F2CF58BF8799EA0D /* Playback */ = {
+			isa = PBXGroup;
+			children = (
+				E197474840F655DB7450E7BF /* LocalServer.swift */,
+				C5CE08079BB944428C23076F /* RemuxService.swift */,
+				BAFA7E469068E8C54C7A070B /* SegmentStorage.swift */,
+			);
+			path = Playback;
+			sourceTree = "<group>";
+		};
+		4F4344D984CDF3716D557E96 /* Debug */ = {
+			isa = PBXGroup;
+			children = (
+				C87C2AEA78C24CB5B3A74855 /* ProbeTest.swift */,
+			);
+			path = Debug;
+			sourceTree = "<group>";
+		};
+		50A1C4105BB8E6460FB9FC18 /* State */ = {
+			isa = PBXGroup;
+			children = (
+				72507E7DA214FC88BE156C03 /* TVAppState.swift */,
+			);
+			path = State;
+			sourceTree = "<group>";
+		};
+		513001CAADEF0F05709729E7 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				6D91040AF8844C19C51B44AD /* CastTV-iOS.app */,
+				5BF556BB3D3B3C310154FB46 /* CastTV-tvOS.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		647EADB8CA6E28200F1CBBFE /* tvOS */ = {
+			isa = PBXGroup;
+			children = (
+				FB4A7F006F529109048C575B /* CastTVtvOSApp.swift */,
+				0B54BDB03BD2EC3D5788EA02 /* Media */,
+				4698E1F1F2CF58BF8799EA0D /* Playback */,
+				50A1C4105BB8E6460FB9FC18 /* State */,
+				B669ABE26EE6F3233F11C05F /* Views */,
+			);
+			path = tvOS;
+			sourceTree = "<group>";
+		};
+		6C532EAFE4211DD97AF7D6E9 /* Media */ = {
+			isa = PBXGroup;
+			children = (
+				3CC0FB059CFFA5845719C3F6 /* MediaProber.swift */,
+			);
+			path = Media;
+			sourceTree = "<group>";
+		};
+		7325984FAE0320E5ADEE2CBC /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				9BBC00FD39C9D4F03C285816 /* CastTVShared */,
+				34FBB3442EC12652A4D3049A /* FFmpegKit */,
+			);
+			name = Packages;
+			sourceTree = "<group>";
+		};
+		9DA5C32FA96D7142AFB0AB49 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				35FF36C99838C45DA5EF2DC0 /* DeviceRow.swift */,
+				5525D8ACA183344D2209EB70 /* HistoryCard.swift */,
+				7EE254DE398E5883806D3BCB /* HomeView.swift */,
+				9B4B9870A8F011631524D373 /* LogViewerView.swift */,
+				756CB4534698D56AAD50EF6F /* ProbeResultsView.swift */,
+				9AA83178EFCA3F2DADB030FA /* QRScannerView.swift */,
+				D2E8F13C01467D33AB49B2AE /* URLEntryView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		B669ABE26EE6F3233F11C05F /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				6E2BCA999FED373A9189F57D /* DirectURLView.swift */,
+				56B59DCF9D4DE1DE66EB513A /* PlayerView.swift */,
+				661F1B5B9CEBF625528D07E1 /* TVHomeView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		6F4151271B08133C5D53DDD3 /* CastTV-tvOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 41C0098B57D97261CA89F7C8 /* Build configuration list for PBXNativeTarget "CastTV-tvOS" */;
+			buildPhases = (
+				B313E5AE6C9171E242ABCC32 /* Sources */,
+				78C6C603977A95B89567C367 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "CastTV-tvOS";
+			packageProductDependencies = (
+				772DFA287ACB53FEFC468CF7 /* CastTVShared */,
+				59BE20716648EF11633A5B3A /* FFmpegKit */,
+			);
+			productName = "CastTV-tvOS";
+			productReference = 5BF556BB3D3B3C310154FB46 /* CastTV-tvOS.app */;
+			productType = "com.apple.product-type.application";
+		};
+		D83D353A957F1005BA8F1DC7 /* CastTV-iOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3842AF1CCAE9C449EF862D27 /* Build configuration list for PBXNativeTarget "CastTV-iOS" */;
+			buildPhases = (
+				B066F196669F6B639D752071 /* Sources */,
+				1038F0404BA62AFADF80AE35 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "CastTV-iOS";
+			packageProductDependencies = (
+				E388C49872B0EF38F6D6CEB8 /* CastTVShared */,
+				23F8C8FFEB17FD4E5964AC8A /* FFmpegKit */,
+			);
+			productName = "CastTV-iOS";
+			productReference = 6D91040AF8844C19C51B44AD /* CastTV-iOS.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		62360035CD9ACB1E1F3BCED7 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1630;
+				TargetAttributes = {
+				};
+			};
+			buildConfigurationList = D8B1CA29153F55708836AD74 /* Build configuration list for PBXProject "CastTV" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 2776F96A6DD39369EA2FEBDE;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				E3EC284BE61B289FFB4CD1F1 /* XCLocalSwiftPackageReference "../CastTVShared" */,
+				6C2F43B3B1D5A3AA915E497D /* XCLocalSwiftPackageReference "../FFmpegKit" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 513001CAADEF0F05709729E7 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				D83D353A957F1005BA8F1DC7 /* CastTV-iOS */,
+				6F4151271B08133C5D53DDD3 /* CastTV-tvOS */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		B066F196669F6B639D752071 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5858126142DE0CE876BBEE15 /* CastTViOSApp.swift in Sources */,
+				C1F81E69412480ABA205A829 /* DeviceRow.swift in Sources */,
+				189742C37C61A278969B9287 /* HistoryCard.swift in Sources */,
+				4E51B8A5263052036DD0D8E9 /* HomeView.swift in Sources */,
+				3F88699D33685C0D901CCAFF /* LogViewerView.swift in Sources */,
+				23219F7D7A293B82D57C90F0 /* MediaProber.swift in Sources */,
+				056F092A3088E8A8B99A18E6 /* ProbeResultsView.swift in Sources */,
+				21C0EEF8A2A4BD7CBD74BA90 /* ProbeTest.swift in Sources */,
+				694DFA7D0FA95B5CBCEC42BD /* QRScannerView.swift in Sources */,
+				18044B3AA1FBD136B2303EBB /* URLEntryView.swift in Sources */,
+				086AC875A48522CF56B5BC22 /* iOSAppState.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B313E5AE6C9171E242ABCC32 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5938A9E11EE518F82E888DF1 /* CapabilityDetector.swift in Sources */,
+				C1887C4EC32D5CFBAC73533A /* CastTVtvOSApp.swift in Sources */,
+				A6F0E84C62159FC81DD51D81 /* DirectURLView.swift in Sources */,
+				314FC768970A272E0B2CFBC4 /* LocalServer.swift in Sources */,
+				388B45DDAAB8FC833EC0311C /* PlayerView.swift in Sources */,
+				D1A55C35F3F4724BBA5571C7 /* RemuxService.swift in Sources */,
+				EC601BD4512D32EE9F911684 /* SegmentStorage.swift in Sources */,
+				6330011A00F84235893AC409 /* TVAppState.swift in Sources */,
+				7D0D2605539D526F48BCB277 /* TVHomeView.swift in Sources */,
+				A09C4C8C615E0CC640D3A59D /* TVMediaProber.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		306A7B5ABC55E03942537CDC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "CastTV needs camera access to scan QR codes for pairing with Apple TV";
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.casttv.ios;
+				PRODUCT_NAME = CastTV;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		C058F3E12747533B6217803B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TVOS_DEPLOYMENT_TARGET = 18.0;
+			};
+			name = Debug;
+		};
+		C2FEF8BE94D5E424D86EC15D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "CastTV needs camera access to scan QR codes for pairing with Apple TV";
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.casttv.ios;
+				PRODUCT_NAME = CastTV;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		DBE95FA5068B301C50091769 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon & Top Shelf Image";
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.casttv.tvos;
+				PRODUCT_NAME = CastTV;
+				SDKROOT = appletvos;
+				TARGETED_DEVICE_FAMILY = 3;
+			};
+			name = Debug;
+		};
+		E0A5C9FB2DDBD54C2E97D831 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon & Top Shelf Image";
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.casttv.tvos;
+				PRODUCT_NAME = CastTV;
+				SDKROOT = appletvos;
+				TARGETED_DEVICE_FAMILY = 3;
+			};
+			name = Release;
+		};
+		F0511C65B4A80ECC2A8D1FA9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				TVOS_DEPLOYMENT_TARGET = 18.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		3842AF1CCAE9C449EF862D27 /* Build configuration list for PBXNativeTarget "CastTV-iOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				306A7B5ABC55E03942537CDC /* Debug */,
+				C2FEF8BE94D5E424D86EC15D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		41C0098B57D97261CA89F7C8 /* Build configuration list for PBXNativeTarget "CastTV-tvOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DBE95FA5068B301C50091769 /* Debug */,
+				E0A5C9FB2DDBD54C2E97D831 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		D8B1CA29153F55708836AD74 /* Build configuration list for PBXProject "CastTV" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C058F3E12747533B6217803B /* Debug */,
+				F0511C65B4A80ECC2A8D1FA9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		6C2F43B3B1D5A3AA915E497D /* XCLocalSwiftPackageReference "../FFmpegKit" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../FFmpegKit;
+		};
+		E3EC284BE61B289FFB4CD1F1 /* XCLocalSwiftPackageReference "../CastTVShared" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../CastTVShared;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		23F8C8FFEB17FD4E5964AC8A /* FFmpegKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = FFmpegKit;
+		};
+		59BE20716648EF11633A5B3A /* FFmpegKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = FFmpegKit;
+		};
+		772DFA287ACB53FEFC468CF7 /* CastTVShared */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = CastTVShared;
+		};
+		E388C49872B0EF38F6D6CEB8 /* CastTVShared */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = CastTVShared;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 62360035CD9ACB1E1F3BCED7 /* Project object */;
+}

@@ -1,0 +1,44 @@
+name: CastTV
+options:
+  bundleIdPrefix: com.casttv
+  deploymentTarget:
+    iOS: "18.0"
+    tvOS: "18.0"
+  xcodeVersion: "16.3"
+
+packages:
+  CastTVShared:
+    path: ../CastTVShared
+  FFmpegKit:
+    path: ../FFmpegKit
+
+targets:
+  CastTV-iOS:
+    type: application
+    platform: iOS
+    sources:
+      - path: iOS
+    dependencies:
+      - package: CastTVShared
+      - package: FFmpegKit
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.casttv.ios
+        PRODUCT_NAME: CastTV
+        GENERATE_INFOPLIST_FILE: "YES"
+        INFOPLIST_KEY_UILaunchScreen_Generation: "YES"
+        INFOPLIST_KEY_NSCameraUsageDescription: "CastTV needs camera access to scan QR codes for pairing with Apple TV"
+
+  CastTV-tvOS:
+    type: application
+    platform: tvOS
+    sources:
+      - path: tvOS
+    dependencies:
+      - package: CastTVShared
+      - package: FFmpegKit
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.casttv.tvos
+        PRODUCT_NAME: CastTV
+        GENERATE_INFOPLIST_FILE: "YES"

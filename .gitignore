@@ -1,0 +1,34 @@
+# Build artifacts
+.ffmpeg-build/
+apple/FFmpegKit/Frameworks/
+apple/CastTV/build/
+apple/CastTVShared/.build/
+
+# Xcode
+*.xcuserdata
+xcuserdata/
+DerivedData/
+
+# IPAs
+*.ipa
+
+# macOS
+.DS_Store
+
+# Claude Code
+.claude/
+
+# Environment
+.venv/
+
+# Worker
+worker/node_modules/
+worker/.wrangler/
+worker/dist/
+
+# Android
+android/.gradle/
+android/.kotlin/
+android/build/
+android/app/build/
+android/local.properties
