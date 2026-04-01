@@ -47,7 +47,7 @@ struct DirectURLView: View {
                             .cornerRadius(6)
 
                         if let dur = result.duration {
-                            Text(formatDuration(dur))
+                            Text(Formatting.duration(dur))
                         }
                     }
 

@@ -6,6 +6,9 @@
   "layers" : [
     {
       "filename" : "Layer0.imagestacklayer"
+    },
+    {
+      "filename" : "Layer1.imagestacklayer"
     }
   ]
 }
