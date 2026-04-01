@@ -187,7 +187,7 @@ public enum CompatibilityEngine {
            let sub = result.subtitleTracks.first(where: { $0.id == subID }) {
             let subCompat = check(subtitle: sub, capabilities: capabilities)
             if subCompat.isYellow {
-                let targetFmt = sub.format == .pgs ? "pgs_images" : "webvtt"
+                let targetFmt = sub.format == .pgs ? ProcessingRequirements.SubtitleConvertReq.pgsImages : ProcessingRequirements.SubtitleConvertReq.webvtt
                 subtitleConvert = .init(trackId: subID, targetFormat: targetFmt)
             }
         }

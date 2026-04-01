@@ -104,7 +104,7 @@ final class RemuxService: ObservableObject {
                 let srcURL = sourceURL
                 let stor = storage
                 let subFmt = subtitleFormat
-                if subFmt == "pgs_images" {
+                if subFmt == ProcessingRequirements.SubtitleConvertReq.pgsImages {
                     launchPGSExtraction(sourceURL: srcURL, streamIndex: subIndex, storage: stor)
                 } else {
                     Task.detached {

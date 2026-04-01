@@ -60,12 +60,23 @@ public struct ProcessingRequirements: Codable, Equatable, Sendable {
 
     public struct SubtitleConvertReq: Codable, Equatable, Sendable {
         public let trackId: Int
-        public let targetFormat: String  // "webvtt"
+        public let targetFormat: String
 
-        public init(trackId: Int, targetFormat: String = "webvtt") {
+        /// Convert text-based subtitles (SRT, ASS) to WebVTT.
+        public static let webvtt = "webvtt"
+        /// Extract PGS bitmap subtitles as timed PNG images for overlay rendering.
+        public static let pgsImages = "pgs_images"
+
+        public init(trackId: Int, targetFormat: String = SubtitleConvertReq.webvtt) {
             self.trackId = trackId
             self.targetFormat = targetFormat
         }
+    }
+
+    /// True when only PGS subtitle extraction is needed — no remux or audio transcode.
+    /// The video can play directly with a bitmap overlay.
+    public var isPGSOnly: Bool {
+        !remux && audioTranscode == nil && subtitleConvert?.targetFormat == SubtitleConvertReq.pgsImages
     }
 }
 
