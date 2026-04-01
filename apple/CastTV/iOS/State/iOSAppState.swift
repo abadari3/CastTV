@@ -16,6 +16,7 @@ final class iOSAppState: ObservableObject {
 
     // Local network discovery
     @Published var nearbyTVs: [DiscoveredTV] = []
+    @Published private(set) var nearbyRoomCodes: Set<String> = []
     private let bonjourBrowser = BonjourBrowser()
 
     private let storage = PairingStorage.shared
@@ -44,12 +45,30 @@ final class iOSAppState: ObservableObject {
             guard let self else { return }
             for await discovered in self.bonjourBrowser.discoveries {
                 self.nearbyTVs = discovered
+                self.nearbyRoomCodes = Set(discovered.map(\.roomCode))
                 // Auto-mark paired nearby devices as online
                 for tv in discovered where self.isAlreadyPaired(tv) {
                     self.onlineStatus[tv.roomCode] = true
                 }
             }
         }
+    }
+
+    /// Quick-connect to a TV discovered on the local network.
+    /// If it's already paired, marks it online. If new, pairs automatically.
+    func quickConnect(to tv: DiscoveredTV) {
+        // Check if this TV is already paired
+        if let existing = pairedDevices.first(where: { $0.roomCode == tv.roomCode }) {
+            // Already paired — just mark online
+            onlineStatus[existing.roomCode] = true
+            logger.notice("Quick-connect: already paired to \(tv.deviceName) (room \(tv.roomCode))")
+            return
+        }
+
+        // New TV — pair using the discovered credentials
+        let qrString = "casttv:\(tv.roomCode):\(tv.keyBase64URL)"
+        logger.notice("Quick-connect: pairing with new TV \(tv.deviceName) via Bonjour")
+        handleScannedQR(qrString)
     }
 
     /// Whether a discovered TV is already paired.
@@ -59,7 +78,7 @@ final class iOSAppState: ObservableObject {
 
     /// Whether a paired device was discovered on the local network.
     func isNearby(_ device: PairedDevice) -> Bool {
-        nearbyTVs.contains { $0.roomCode == device.roomCode }
+        nearbyRoomCodes.contains(device.roomCode)
     }
 
     // MARK: - Online Status
@@ -69,7 +88,7 @@ final class iOSAppState: ObservableObject {
         let devices = pairedDevices
 
         // Mark devices found via Bonjour as online immediately
-        let nearbyRoomCodes = Set(nearbyTVs.map(\.roomCode))
+        let nearbyRoomCodes = self.nearbyRoomCodes
 
         await withTaskGroup(of: (String, Bool).self) { group in
             for device in devices {

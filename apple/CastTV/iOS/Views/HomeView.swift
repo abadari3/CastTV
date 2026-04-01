@@ -25,13 +25,13 @@ struct HomeView: View {
                             NearbyTVRow(tv: tv)
                                 .contentShape(Rectangle())
                                 .onTapGesture {
-                                    appState.startScanning()
+                                    appState.quickConnect(to: tv)
                                 }
                         }
                     } header: {
                         Label("Nearby TVs", systemImage: "wifi")
                     } footer: {
-                        Text("Tap to scan the QR code on your TV and pair")
+                        Text("Tap to pair automatically")
                     }
                 }
 
@@ -210,7 +210,7 @@ private struct NearbyTVRow: View {
 
             Spacer()
 
-            Text("Scan QR to Pair")
+            Text("Connect")
                 .font(.subheadline)
                 .foregroundStyle(.blue)
         }

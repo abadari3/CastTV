@@ -214,13 +214,14 @@ final class TVAppState: ObservableObject {
     }
 
     private func startBonjourAdvertising() {
-        guard !roomCode.isEmpty else { return }
+        guard let key = encryptionKey, !roomCode.isEmpty else { return }
+        let keyBase64URL = Encryption.exportKey(key).base64URLEncoded()
         #if os(tvOS)
         let deviceName = UIDevice.current.name
         #else
         let deviceName = "Apple TV"
         #endif
-        bonjourAdvertiser.start(roomCode: roomCode, deviceName: deviceName)
+        bonjourAdvertiser.start(roomCode: roomCode, keyBase64URL: keyBase64URL, deviceName: deviceName)
     }
 
     func resetPairing() {
