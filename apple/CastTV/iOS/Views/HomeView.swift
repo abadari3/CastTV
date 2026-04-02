@@ -10,18 +10,44 @@ struct HomeView: View {
     @State private var showManualPairing = false
     @State private var manualPairingCode = ""
 
+    /// Nearby TVs that are NOT already paired.
+    private var unpairedNearbyTVs: [DiscoveredTV] {
+        appState.nearbyTVs.filter { !appState.isAlreadyPaired($0) }
+    }
+
     var body: some View {
         NavigationStack {
             List {
-                if appState.pairedDevices.isEmpty {
+                // Nearby unpaired TVs discovered via Bonjour
+                if !unpairedNearbyTVs.isEmpty {
+                    Section {
+                        ForEach(unpairedNearbyTVs) { tv in
+                            NearbyTVRow(tv: tv)
+                                .contentShape(Rectangle())
+                                .onTapGesture {
+                                    appState.quickConnect(to: tv)
+                                }
+                        }
+                    } header: {
+                        Label("Nearby TVs", systemImage: "wifi")
+                    } footer: {
+                        Text("Tap to pair automatically")
+                    }
+                }
+
+                if appState.pairedDevices.isEmpty && unpairedNearbyTVs.isEmpty {
                     ContentUnavailableView(
                         "No TVs",
                         systemImage: "tv",
                         description: Text("Tap + to scan a QR code from your Apple TV or Android TV")
                     )
-                } else {
+                } else if !appState.pairedDevices.isEmpty {
                     ForEach(appState.pairedDevices) { device in
-                        DeviceRow(device: device, isOnline: appState.isOnline(device))
+                        DeviceRow(
+                            device: device,
+                            isOnline: appState.isOnline(device),
+                            isNearby: appState.isNearby(device)
+                        )
                             .contentShape(Rectangle())
                             .onTapGesture {
                                 if appState.isOnline(device) {
@@ -159,5 +185,35 @@ struct HomeView: View {
                 Text(appState.pairingError ?? "")
             }
         }
+    }
+}
+
+// MARK: - Nearby TV Row
+
+private struct NearbyTVRow: View {
+    let tv: DiscoveredTV
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: "tv.badge.wifi")
+                .font(.subheadline)
+                .foregroundStyle(.blue)
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text(tv.deviceName)
+                    .font(.headline)
+
+                Text("Found on local network")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            Spacer()
+
+            Text("Connect")
+                .font(.subheadline)
+                .foregroundStyle(.blue)
+        }
+        .padding(.vertical, 4)
     }
 }

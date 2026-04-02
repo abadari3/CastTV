@@ -28,6 +28,7 @@ final class TVAppState: ObservableObject {
     private var encryptionKey: SymmetricKey?
     private var webSocket: WebSocketClient?
     private let storage = PairingStorage.shared
+    private let bonjourAdvertiser = BonjourAdvertiser()
 
     init() {
         if let savedCode = storage.loadOwnRoomCode(),
@@ -45,6 +46,7 @@ final class TVAppState: ObservableObject {
             qrCodeImage = qrData.generateImage()
 
             CastTVLogger.shared.info("Restored pairing: room \(savedCode)")
+            startBonjourAdvertising()
             connectToRoom()
         } else {
             CastTVLogger.shared.info("No saved pairing, will show QR")
@@ -85,6 +87,7 @@ final class TVAppState: ObservableObject {
 
                 logger.notice("[CastTV] Room code: \(code), connecting...")
                 CastTVLogger.shared.info("Room \(code) created, connecting...")
+                self.startBonjourAdvertising()
                 connectToRoom()
                 self.isConnecting = false
             } catch {
@@ -210,7 +213,19 @@ final class TVAppState: ObservableObject {
         currentURL = nil
     }
 
+    private func startBonjourAdvertising() {
+        guard let key = encryptionKey, !roomCode.isEmpty else { return }
+        let keyBase64URL = Encryption.exportKey(key).base64URLEncoded()
+        #if os(tvOS)
+        let deviceName = UIDevice.current.name
+        #else
+        let deviceName = "Apple TV"
+        #endif
+        bonjourAdvertiser.start(roomCode: roomCode, keyBase64URL: keyBase64URL, deviceName: deviceName)
+    }
+
     func resetPairing() {
+        bonjourAdvertiser.stop()
         webSocket?.disconnect()
         webSocket = nil
 

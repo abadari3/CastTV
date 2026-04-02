@@ -19,6 +19,7 @@ import com.casttv.androidtv.network.CastWebSocketClient
 import com.casttv.androidtv.network.ConnectionState
 import com.casttv.androidtv.network.MessageCodec
 import com.casttv.androidtv.network.LogsHistoryMessage
+import com.casttv.androidtv.network.NsdAdvertiser
 import com.casttv.androidtv.network.PlayMessage
 import com.casttv.androidtv.player.PlayerActivity
 import com.casttv.androidtv.storage.CastLogger
@@ -35,6 +36,7 @@ class MainActivity : ComponentActivity() {
 
     private lateinit var storage: PairingStorage
     private var wsClient: CastWebSocketClient? = null
+    private var nsdAdvertiser: NsdAdvertiser? = null
 
     private val roomCode = mutableStateOf("")
     private val qrBitmap = mutableStateOf<Bitmap?>(null)
@@ -77,6 +79,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        nsdAdvertiser?.stop()
         wsClient?.disconnect()
     }
 
@@ -102,6 +105,7 @@ class MainActivity : ComponentActivity() {
         qrBitmap.value = bitmap
 
         CastLogger.info("Room code: $code")
+        startNsdAdvertising(code, key)
         connectWebSocket(code, key)
     }
 
@@ -196,6 +200,16 @@ class MainActivity : ComponentActivity() {
             play.tracks?.subtitle?.let { putExtra(PlayerActivity.EXTRA_SUBTITLE_TRACK, it) }
         }
         startActivity(intent)
+    }
+
+    private fun startNsdAdvertising(code: String, key: ByteArray) {
+        val advertiser = NsdAdvertiser(this)
+        nsdAdvertiser = advertiser
+        advertiser.start(
+            roomCode = code,
+            keyBase64URL = Encryption.keyToBase64Url(key),
+            deviceName = android.os.Build.MODEL
+        )
     }
 
     private fun generateRoomCode(): String {
