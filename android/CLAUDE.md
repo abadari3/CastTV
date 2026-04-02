@@ -30,6 +30,7 @@ app/src/main/java/com/casttv/androidtv/
   network/
     WebSocketClient.kt      # OkHttp WebSocket: encrypted messaging, auto-reconnect (2s delay)
     Messages.kt             # Sealed class CastMessage + MessageCodec (Gson-based JSON)
+    NsdAdvertiser.kt        # mDNS/Bonjour advertising via NsdManager (matches tvOS BonjourAdvertiser)
   crypto/
     Encryption.kt           # AES-256-GCM via javax.crypto (cross-compatible with CryptoKit)
     QRCodeGenerator.kt      # ZXing QR bitmap + casttv:<room>:<key> format
