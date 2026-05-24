@@ -131,7 +131,7 @@ jobs:
         run: |
           rm -rf Payload
           mkdir Payload
-          cp -R ios-app/ Payload/CastTV.app
+          mv ios-app Payload/CastTV.app
           zip -r CastTV-iOS.ipa Payload
           rm -rf Payload
 
@@ -139,7 +139,7 @@ jobs:
         run: |
           rm -rf Payload
           mkdir Payload
-          cp -R tvos-app/ Payload/CastTV.app
+          mv tvos-app Payload/CastTV.app
           zip -r CastTV-tvOS.ipa Payload
           rm -rf Payload
 
