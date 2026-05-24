@@ -42,6 +42,8 @@ jobs:
             ~/.gradle/caches
             ~/.gradle/wrapper
           key: gradle-${{ hashFiles('android/**/*.gradle*', 'android/gradle/wrapper/gradle-wrapper.properties') }}
+          restore-keys: |
+            gradle-
 
       - name: ktlint
         working-directory: android
