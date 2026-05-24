@@ -41,9 +41,9 @@
 		408EEE63380E753EC7A28665 /* iOSAppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iOSAppState.swift; sourceTree = "<group>"; };
 		5525D8ACA183344D2209EB70 /* HistoryCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryCard.swift; sourceTree = "<group>"; };
 		56B59DCF9D4DE1DE66EB513A /* PlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerView.swift; sourceTree = "<group>"; };
-		5BF556BB3D3B3C310154FB46 /* CastTV-tvOS.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = "CastTV-tvOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		5BF556BB3D3B3C310154FB46 /* CastTV.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CastTV.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		661F1B5B9CEBF625528D07E1 /* TVHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TVHomeView.swift; sourceTree = "<group>"; };
-		6D91040AF8844C19C51B44AD /* CastTV-iOS.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = "CastTV-iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		6D91040AF8844C19C51B44AD /* CastTV.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CastTV.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6E2BCA999FED373A9189F57D /* DirectURLView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DirectURLView.swift; sourceTree = "<group>"; };
 		72507E7DA214FC88BE156C03 /* TVAppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TVAppState.swift; sourceTree = "<group>"; };
 		756CB4534698D56AAD50EF6F /* ProbeResultsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProbeResultsView.swift; sourceTree = "<group>"; };
@@ -152,8 +152,8 @@
 		513001CAADEF0F05709729E7 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				6D91040AF8844C19C51B44AD /* CastTV-iOS.app */,
-				5BF556BB3D3B3C310154FB46 /* CastTV-tvOS.app */,
+				6D91040AF8844C19C51B44AD /* CastTV.app */,
+				5BF556BB3D3B3C310154FB46 /* CastTV.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -231,7 +231,7 @@
 				59BE20716648EF11633A5B3A /* FFmpegKit */,
 			);
 			productName = "CastTV-tvOS";
-			productReference = 5BF556BB3D3B3C310154FB46 /* CastTV-tvOS.app */;
+			productReference = 5BF556BB3D3B3C310154FB46 /* CastTV.app */;
 			productType = "com.apple.product-type.application";
 		};
 		D83D353A957F1005BA8F1DC7 /* CastTV-iOS */ = {
@@ -251,7 +251,7 @@
 				23F8C8FFEB17FD4E5964AC8A /* FFmpegKit */,
 			);
 			productName = "CastTV-iOS";
-			productReference = 6D91040AF8844C19C51B44AD /* CastTV-iOS.app */;
+			productReference = 6D91040AF8844C19C51B44AD /* CastTV.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -262,8 +262,6 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1630;
-				TargetAttributes = {
-				};
 			};
 			buildConfigurationList = D8B1CA29153F55708836AD74 /* Build configuration list for PBXProject "CastTV" */;
 			developmentRegion = en;
@@ -333,6 +331,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = 7HC44PQ926;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSCameraUsageDescription = "CastTV needs camera access to scan QR codes for pairing with Apple TV";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -340,7 +339,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.casttv.ios;
+				PRODUCT_BUNDLE_IDENTIFIER = com.anandabadari.casttv;
 				PRODUCT_NAME = CastTV;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -415,6 +414,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = 7HC44PQ926;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSCameraUsageDescription = "CastTV needs camera access to scan QR codes for pairing with Apple TV";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -422,7 +422,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.casttv.ios;
+				PRODUCT_BUNDLE_IDENTIFIER = com.anandabadari.casttv;
 				PRODUCT_NAME = CastTV;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -434,12 +434,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon & Top Shelf Image";
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				DEVELOPMENT_TEAM = 7HC44PQ926;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.casttv.tvos;
+				PRODUCT_BUNDLE_IDENTIFIER = com.anandabadari.casttv.tvos;
 				PRODUCT_NAME = CastTV;
 				SDKROOT = appletvos;
 				TARGETED_DEVICE_FAMILY = 3;
@@ -451,12 +452,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon & Top Shelf Image";
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				DEVELOPMENT_TEAM = 7HC44PQ926;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.casttv.tvos;
+				PRODUCT_BUNDLE_IDENTIFIER = com.anandabadari.casttv.tvos;
 				PRODUCT_NAME = CastTV;
 				SDKROOT = appletvos;
 				TARGETED_DEVICE_FAMILY = 3;
