@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/abadari3/CastTV/compare/v1.0.6...v1.1.0) (2026-05-24)
+
+
+### Features
+
+* **worker:** add AltStore source endpoint at /altstore.json ([#18](https://github.com/abadari3/CastTV/issues/18)) ([763b393](https://github.com/abadari3/CastTV/commit/763b3934223d37d27f51eb78cb3ba4e5a6af2ed8))
+
 ## [1.0.6](https://github.com/abadari3/CastTV/compare/v1.0.5...v1.0.6) (2026-05-24)
 
 
