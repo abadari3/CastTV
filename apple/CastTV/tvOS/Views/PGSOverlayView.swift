@@ -12,6 +12,9 @@ struct PGSOverlayView: View {
     let videoSize: CGSize
 
     var body: some View {
+        // `geo` is used via `geo.size` below; SwiftLint's analyzer misses it
+        // (likely confused by the `if let image, let entry` shadowing).
+        // swiftlint:disable:next unused_closure_parameter
         GeometryReader { geo in
             if let image, let entry {
                 let scale = scaleFactor(viewSize: geo.size)
