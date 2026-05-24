@@ -1,7 +1,7 @@
 package com.casttv.androidtv.crypto
 
-import android.util.Base64
 import java.security.SecureRandom
+import java.util.Base64
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
 import javax.crypto.spec.GCMParameterSpec
@@ -48,14 +48,14 @@ object Encryption {
     }
 
     /** Encode key as base64url (no padding) — matches Swift's base64URLEncoded(). */
-    fun keyToBase64Url(key: ByteArray): String = Base64.encodeToString(key, Base64.NO_PADDING or Base64.NO_WRAP or Base64.URL_SAFE)
+    fun keyToBase64Url(key: ByteArray): String = Base64.getUrlEncoder().withoutPadding().encodeToString(key)
 
     /** Decode base64url key. */
-    fun keyFromBase64Url(encoded: String): ByteArray = Base64.decode(encoded, Base64.NO_PADDING or Base64.NO_WRAP or Base64.URL_SAFE)
+    fun keyFromBase64Url(encoded: String): ByteArray = Base64.getUrlDecoder().decode(encoded)
 
     /** Encode encrypted payload as standard base64 for WebSocket transport. */
-    fun encryptedToBase64(data: ByteArray): String = Base64.encodeToString(data, Base64.NO_WRAP)
+    fun encryptedToBase64(data: ByteArray): String = Base64.getEncoder().encodeToString(data)
 
     /** Decode base64 WebSocket payload. */
-    fun base64ToBytes(encoded: String): ByteArray = Base64.decode(encoded, Base64.NO_WRAP)
+    fun base64ToBytes(encoded: String): ByteArray = Base64.getDecoder().decode(encoded)
 }

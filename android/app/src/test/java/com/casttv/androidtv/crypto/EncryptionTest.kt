@@ -45,4 +45,36 @@ class EncryptionTest {
         val decrypted = Encryption.decrypt(encrypted, key)
         assertEquals(0, decrypted.size)
     }
+
+    @Test
+    fun keyBase64UrlRoundTrip() {
+        val key = Encryption.generateKey()
+        val encoded = Encryption.keyToBase64Url(key)
+        // Base64url: no padding (=), only A-Z a-z 0-9 - _
+        assertEquals(43, encoded.length) // 32 bytes -> 43 chars unpadded
+        assert(!encoded.contains('=')) { "URL-safe encoding must not contain padding" }
+        assert(!encoded.contains('+')) { "URL-safe encoding must not contain +" }
+        assert(!encoded.contains('/')) { "URL-safe encoding must not contain /" }
+        val decoded = Encryption.keyFromBase64Url(encoded)
+        assertArrayEquals(key, decoded)
+    }
+
+    @Test
+    fun keyBase64UrlMatchesKnownFixture() {
+        // 32-byte key of all zeros -> 43 zero-bytes encoded as 'A' * 43
+        val zeros = ByteArray(32)
+        assertEquals("A".repeat(43), Encryption.keyToBase64Url(zeros))
+        assertArrayEquals(zeros, Encryption.keyFromBase64Url("A".repeat(43)))
+    }
+
+    @Test
+    fun encryptedBase64RoundTrip() {
+        val key = Encryption.generateKey()
+        val payload = "WebSocket frame".toByteArray()
+        val encrypted = Encryption.encrypt(payload, key)
+        val encoded = Encryption.encryptedToBase64(encrypted)
+        val decoded = Encryption.base64ToBytes(encoded)
+        assertArrayEquals(encrypted, decoded)
+        assertArrayEquals(payload, Encryption.decrypt(decoded, key))
+    }
 }
