@@ -160,3 +160,26 @@ Open `android/` in Android Studio. Build and install.
 3. Done. The iPhone saves the pairing and shows the TV in its device list.
 
 The QR code encodes `casttv:ROOMCODE:ENCRYPTION_KEY`. Both devices connect to the same relay room. All subsequent communication is encrypted with the shared key.
+
+## Releasing
+
+CI/CD is driven by Conventional Commits via [`release-please`](https://github.com/googleapis/release-please).
+
+1. Open a PR. The title must use a Conventional Commits prefix (`feat:`, `fix:`, `chore:`, `docs:`, `refactor:`, `test:`, `ci:`, `build:`, `perf:`, `revert:`, `style:`) — enforced by the PR title check.
+2. Four required status checks must pass before merging: `Apple / Build`, `Android / Build`, `Worker / Build`, `PR Title Check / main`.
+3. Merge the PR. Squash-merge is the only allowed mode — the PR title becomes the squashed commit on `main`.
+4. `release-please` reads new commits on `main` and opens/updates a "Release PR" with a version bump and changelog.
+5. Merge the Release PR when ready to ship. `release-please` cuts a `v*` tag.
+6. The tag fires the per-platform release jobs: `apple.yml` packages and uploads iOS/tvOS IPAs to the GitHub Release, `android.yml` uploads the APK, and `worker.yml` deploys to Cloudflare with a post-deploy smoke check.
+
+`chore:`, `docs:`, `refactor:`, `style:`, `test:`, and `ci:` commits do not trigger a release on their own — they accumulate until a `feat:` or `fix:` lands.
+
+Five workflows live under `.github/workflows/`:
+
+| Workflow | Triggers | Does |
+|---|---|---|
+| `apple.yml` | PR, push to main, tag `v*` | Build iOS + tvOS, SwiftLint, run Swift tests. On tag: package IPAs, upload to GitHub Release. |
+| `android.yml` | PR, push to main, tag `v*` | Build APK, ktlint, run Kotlin tests. On tag: upload APK. |
+| `worker.yml` | PR, push to main, tag `v*` | Type/syntax check, Prettier, run worker tests. On tag: `wrangler deploy` + smoke check. |
+| `pr-title.yml` | `pull_request` | Validate Conventional Commits prefix in PR title. |
+| `release-please.yml` | Push to main | Maintain Release PR; cut tag when it merges. |
