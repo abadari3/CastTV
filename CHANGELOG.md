@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.5](https://github.com/abadari3/CastTV/compare/v1.0.4...v1.0.5) (2026-05-24)
+
+
+### Bug Fixes
+
+* **config:** remove duplicate release-type from release-please-config.json ([#14](https://github.com/abadari3/CastTV/issues/14)) ([d2c1b0d](https://github.com/abadari3/CastTV/commit/d2c1b0def705321f784f38f4277f128d7b20a8d0))
+
 ## [1.0.4](https://github.com/abadari3/CastTV/compare/v1.0.3...v1.0.4) (2026-05-24)
 
 
