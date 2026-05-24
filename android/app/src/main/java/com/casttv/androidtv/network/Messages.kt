@@ -12,21 +12,22 @@ data class PlayMessage(
     val url: String,
     @SerializedName("subtitleUrl") val subtitleUrl: String? = null,
     val tracks: TrackSelection? = null,
-    val processing: ProcessingRequirements? = null
+    val processing: ProcessingRequirements? = null,
 )
 
 data class TrackSelection(
     val video: Int? = null,
     val audio: Int? = null,
-    val subtitle: Int? = null
+    val subtitle: Int? = null,
 )
 
 data class ProcessingRequirements(
     val remux: Boolean = false,
     val audioTranscode: AudioTranscodeReq? = null,
-    val subtitleConvert: SubtitleConvertReq? = null
+    val subtitleConvert: SubtitleConvertReq? = null,
 ) {
     data class AudioTranscodeReq(val trackId: Int, val targetCodec: String = "aac")
+
     data class SubtitleConvertReq(val trackId: Int, val targetFormat: String = "webvtt")
 }
 
@@ -38,7 +39,7 @@ data class CapabilitiesMessage(
     val tvOS: String,
     val name: String,
     val display: DisplayCapabilities,
-    val audio: AudioCapabilities
+    val audio: AudioCapabilities,
 )
 
 data class DisplayCapabilities(
@@ -46,45 +47,52 @@ data class DisplayCapabilities(
     val availableModes: List<String>,
     val maxRefreshRate: Int,
     val displayGamut: String,
-    val hdrModes: List<String>
+    val hdrModes: List<String>,
 )
 
 data class AudioCapabilities(
     val maxChannels: Int,
     val outputType: String,
     val atmosSupported: Boolean,
-    val spatialAudioEnabled: Boolean
+    val spatialAudioEnabled: Boolean,
 )
 
 data class ErrorMessage(
     val type: String = "error",
     val code: String,
-    val message: String
+    val message: String,
 )
 
 data class LogMessage(
     val type: String = "log",
     val timestamp: String,
     val level: String,
-    val message: String
+    val message: String,
 )
 
 data class LogsHistoryMessage(
     val type: String = "logs_history",
     val session: String,
-    val entries: List<LogMessage>
+    val entries: List<LogMessage>,
 )
 
 // MARK: - Envelope
 
 sealed class CastMessage {
     data class Play(val msg: PlayMessage) : CastMessage()
+
     data class Capabilities(val msg: CapabilitiesMessage) : CastMessage()
+
     data class Error(val msg: ErrorMessage) : CastMessage()
+
     data class Log(val msg: LogMessage) : CastMessage()
+
     object ClearLogs : CastMessage()
+
     data class DeviceJoined(val role: String) : CastMessage()
+
     data class DeviceLeft(val role: String) : CastMessage()
+
     data class Unknown(val raw: String) : CastMessage()
 }
 
@@ -113,10 +121,12 @@ object MessageCodec {
     }
 
     fun encode(msg: CapabilitiesMessage): String = gson.toJson(msg)
+
     fun encode(msg: LogMessage): String = gson.toJson(msg)
+
     fun encode(msg: LogsHistoryMessage): String = gson.toJson(msg)
+
     fun encode(msg: ErrorMessage): String = gson.toJson(msg)
 
-    private fun JsonObject.getStringOrNull(key: String): String? =
-        if (has(key) && !get(key).isJsonNull) get(key).asString else null
+    private fun JsonObject.getStringOrNull(key: String): String? = if (has(key) && !get(key).isJsonNull) get(key).asString else null
 }

@@ -8,7 +8,6 @@ import com.casttv.androidtv.crypto.Encryption
  * Persists this Android TV's room code and AES-256 encryption key.
  */
 class PairingStorage(context: Context) {
-
     private val prefs: SharedPreferences =
         context.getSharedPreferences("com.casttv.androidtv.pairing", Context.MODE_PRIVATE)
 
@@ -16,11 +15,9 @@ class PairingStorage(context: Context) {
 
     fun loadRoomCode(): String? = prefs.getString(KEY_ROOM_CODE, null)
 
-    fun saveEncryptionKey(key: ByteArray) =
-        prefs.edit().putString(KEY_ENCRYPTION_KEY, Encryption.keyToBase64Url(key)).apply()
+    fun saveEncryptionKey(key: ByteArray) = prefs.edit().putString(KEY_ENCRYPTION_KEY, Encryption.keyToBase64Url(key)).apply()
 
-    fun loadEncryptionKey(): ByteArray? =
-        prefs.getString(KEY_ENCRYPTION_KEY, null)?.let { Encryption.keyFromBase64Url(it) }
+    fun loadEncryptionKey(): ByteArray? = prefs.getString(KEY_ENCRYPTION_KEY, null)?.let { Encryption.keyFromBase64Url(it) }
 
     fun clear() = prefs.edit().clear().apply()
 

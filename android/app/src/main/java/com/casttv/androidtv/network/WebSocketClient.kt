@@ -30,11 +30,12 @@ enum class ConnectionState { DISCONNECTED, CONNECTING, CONNECTED }
 class CastWebSocketClient(
     private val roomCode: String,
     private val encryptionKey: ByteArray,
-    private val scope: CoroutineScope
+    private val scope: CoroutineScope,
 ) {
-    private val client = OkHttpClient.Builder()
-        .pingInterval(20, TimeUnit.SECONDS)
-        .build()
+    private val client =
+        OkHttpClient.Builder()
+            .pingInterval(20, TimeUnit.SECONDS)
+            .build()
 
     private val _state = MutableStateFlow(ConnectionState.DISCONNECTED)
     val state: StateFlow<ConnectionState> = _state
@@ -80,34 +81,49 @@ class CastWebSocketClient(
     }
 
     private fun scheduleReconnect() {
-        reconnectJob = scope.launch(Dispatchers.IO) {
-            delay(2000)
-            if (shouldReconnect && _state.value == ConnectionState.DISCONNECTED) {
-                openSocket()
+        reconnectJob =
+            scope.launch(Dispatchers.IO) {
+                delay(2000)
+                if (shouldReconnect && _state.value == ConnectionState.DISCONNECTED) {
+                    openSocket()
+                }
             }
-        }
     }
 
     private inner class Listener : WebSocketListener() {
-        override fun onOpen(webSocket: WebSocket, response: Response) {
+        override fun onOpen(
+            webSocket: WebSocket,
+            response: Response,
+        ) {
             Log.i(TAG, "Connected")
             _state.value = ConnectionState.CONNECTED
         }
 
-        override fun onMessage(webSocket: WebSocket, text: String) {
+        override fun onMessage(
+            webSocket: WebSocket,
+            text: String,
+        ) {
             val json = tryDecrypt(text) ?: text
             val msg = MessageCodec.decode(json)
             scope.launch { _messages.emit(msg) }
         }
 
-        override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
+        override fun onFailure(
+            webSocket: WebSocket,
+            t: Throwable,
+            response: Response?,
+        ) {
             Log.e(TAG, "WebSocket failure: $t")
             socket = null
             _state.value = ConnectionState.DISCONNECTED
             if (shouldReconnect) scheduleReconnect()
         }
 
-        override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
+        override fun onClosed(
+            webSocket: WebSocket,
+            code: Int,
+            reason: String,
+        ) {
             Log.i(TAG, "Closed: $code $reason")
             socket = null
             _state.value = ConnectionState.DISCONNECTED

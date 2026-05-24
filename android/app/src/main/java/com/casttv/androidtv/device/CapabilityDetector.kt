@@ -15,7 +15,6 @@ import com.casttv.androidtv.network.DisplayCapabilities
  * Sends these to the iPhone so it can show correct compatibility indicators.
  */
 object CapabilityDetector {
-
     fun detect(context: Context): CapabilitiesMessage {
         val display = detectDisplay(context)
         val audio = detectAudio(context)
@@ -26,54 +25,57 @@ object CapabilityDetector {
             tvOS = androidVersion,
             name = Build.MODEL,
             display = display,
-            audio = audio
+            audio = audio,
         )
     }
 
     private fun detectDisplay(context: Context): DisplayCapabilities {
         val wm = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-        val display = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            context.display
-        } else {
-            @Suppress("DEPRECATION")
-            wm.defaultDisplay
-        }
+        val display =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                context.display
+            } else {
+                @Suppress("DEPRECATION")
+                wm.defaultDisplay
+            }
 
         val mode = display?.mode
         val width = mode?.physicalWidth ?: 1920
         val height = mode?.physicalHeight ?: 1080
         val refreshRate = mode?.refreshRate?.toInt() ?: 60
 
-        val resolution = when {
-            width >= 3840 || height >= 2160 -> "4K"
-            width >= 1920 || height >= 1080 -> "1080p"
-            width >= 1280 || height >= 720  -> "720p"
-            else -> "${width}x${height}"
-        }
+        val resolution =
+            when {
+                width >= 3840 || height >= 2160 -> "4K"
+                width >= 1920 || height >= 1080 -> "1080p"
+                width >= 1280 || height >= 720 -> "720p"
+                else -> "${width}x$height"
+            }
 
         val hdrModes = mutableListOf<String>()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             val hdrCaps = display?.hdrCapabilities
             hdrCaps?.supportedHdrTypes?.forEach { type ->
                 when (type) {
-                    Display.HdrCapabilities.HDR_TYPE_HDR10        -> hdrModes.add("hdr10")
-                    Display.HdrCapabilities.HDR_TYPE_HDR10_PLUS   -> hdrModes.add("hdr10plus")
+                    Display.HdrCapabilities.HDR_TYPE_HDR10 -> hdrModes.add("hdr10")
+                    Display.HdrCapabilities.HDR_TYPE_HDR10_PLUS -> hdrModes.add("hdr10plus")
                     Display.HdrCapabilities.HDR_TYPE_DOLBY_VISION -> hdrModes.add("dolbyVision")
-                    Display.HdrCapabilities.HDR_TYPE_HLG          -> hdrModes.add("hlg")
+                    Display.HdrCapabilities.HDR_TYPE_HLG -> hdrModes.add("hlg")
                 }
             }
         }
 
-        val availableModes = display?.supportedModes?.map {
-            "${it.physicalWidth}x${it.physicalHeight}@${it.refreshRate.toInt()}"
-        } ?: listOf("${width}x${height}@$refreshRate")
+        val availableModes =
+            display?.supportedModes?.map {
+                "${it.physicalWidth}x${it.physicalHeight}@${it.refreshRate.toInt()}"
+            } ?: listOf("${width}x$height@$refreshRate")
 
         return DisplayCapabilities(
             resolution = resolution,
             availableModes = availableModes,
             maxRefreshRate = refreshRate,
             displayGamut = "sRGB",
-            hdrModes = hdrModes
+            hdrModes = hdrModes,
         )
     }
 
@@ -109,7 +111,7 @@ object CapabilityDetector {
             maxChannels = maxChannels,
             outputType = outputType,
             atmosSupported = atmosSupported,
-            spatialAudioEnabled = false
+            spatialAudioEnabled = false,
         )
     }
 }

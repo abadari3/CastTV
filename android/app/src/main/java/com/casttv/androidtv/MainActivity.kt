@@ -8,6 +8,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.lifecycleScope
@@ -17,8 +18,8 @@ import com.casttv.androidtv.device.CapabilityDetector
 import com.casttv.androidtv.network.CastMessage
 import com.casttv.androidtv.network.CastWebSocketClient
 import com.casttv.androidtv.network.ConnectionState
-import com.casttv.androidtv.network.MessageCodec
 import com.casttv.androidtv.network.LogsHistoryMessage
+import com.casttv.androidtv.network.MessageCodec
 import com.casttv.androidtv.network.PlayMessage
 import com.casttv.androidtv.player.PlayerActivity
 import com.casttv.androidtv.storage.CastLogger
@@ -29,10 +30,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import androidx.compose.runtime.*
 
 class MainActivity : ComponentActivity() {
-
     private lateinit var storage: PairingStorage
     private var wsClient: CastWebSocketClient? = null
 
@@ -56,7 +55,7 @@ class MainActivity : ComponentActivity() {
                         connectionState = connectionState.value,
                         connectedDeviceName = connectedDeviceName.value,
                         errorMessage = errorMessage.value,
-                        qrString = qrString.value
+                        qrString = qrString.value,
                     )
                 }
             }
@@ -81,21 +80,24 @@ class MainActivity : ComponentActivity() {
     }
 
     private suspend fun startPairing() {
-        val code = storage.loadRoomCode() ?: run {
-            val newCode = generateRoomCode()
-            storage.saveRoomCode(newCode)
-            newCode
-        }
-        val key = storage.loadEncryptionKey() ?: run {
-            val newKey = Encryption.generateKey()
-            storage.saveEncryptionKey(newKey)
-            newKey
-        }
+        val code =
+            storage.loadRoomCode() ?: run {
+                val newCode = generateRoomCode()
+                storage.saveRoomCode(newCode)
+                newCode
+            }
+        val key =
+            storage.loadEncryptionKey() ?: run {
+                val newKey = Encryption.generateKey()
+                storage.saveEncryptionKey(newKey)
+                newKey
+            }
 
         val pairingString = QRCodeGenerator.buildPairingString(code, key)
-        val bitmap = withContext(Dispatchers.Default) {
-            QRCodeGenerator.generate(pairingString, 512)
-        }
+        val bitmap =
+            withContext(Dispatchers.Default) {
+                QRCodeGenerator.generate(pairingString, 512)
+            }
 
         roomCode.value = code
         qrString.value = pairingString
@@ -105,7 +107,10 @@ class MainActivity : ComponentActivity() {
         connectWebSocket(code, key)
     }
 
-    private fun connectWebSocket(code: String, key: ByteArray) {
+    private fun connectWebSocket(
+        code: String,
+        key: ByteArray,
+    ) {
         val ws = CastWebSocketClient(code, key, lifecycleScope)
         wsClient = ws
 
@@ -178,23 +183,25 @@ class MainActivity : ComponentActivity() {
         if (previous.isNotEmpty()) {
             val sdf = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", java.util.Locale.US)
             sdf.timeZone = java.util.TimeZone.getTimeZone("UTC")
-            val history = LogsHistoryMessage(
-                session = sdf.format(CastLogger.sessionStart),
-                entries = previous
-            )
+            val history =
+                LogsHistoryMessage(
+                    session = sdf.format(CastLogger.sessionStart),
+                    entries = previous,
+                )
             ws.send(MessageCodec.encode(history))
             CastLogger.info("Sent ${previous.size} previous session log entries")
         }
     }
 
     private fun launchPlayer(play: PlayMessage) {
-        val intent = Intent(this, PlayerActivity::class.java).apply {
-            putExtra(PlayerActivity.EXTRA_URL, play.url)
-            putExtra(PlayerActivity.EXTRA_SUBTITLE_URL, play.subtitleUrl)
-            play.tracks?.video?.let { putExtra(PlayerActivity.EXTRA_VIDEO_TRACK, it) }
-            play.tracks?.audio?.let { putExtra(PlayerActivity.EXTRA_AUDIO_TRACK, it) }
-            play.tracks?.subtitle?.let { putExtra(PlayerActivity.EXTRA_SUBTITLE_TRACK, it) }
-        }
+        val intent =
+            Intent(this, PlayerActivity::class.java).apply {
+                putExtra(PlayerActivity.EXTRA_URL, play.url)
+                putExtra(PlayerActivity.EXTRA_SUBTITLE_URL, play.subtitleUrl)
+                play.tracks?.video?.let { putExtra(PlayerActivity.EXTRA_VIDEO_TRACK, it) }
+                play.tracks?.audio?.let { putExtra(PlayerActivity.EXTRA_AUDIO_TRACK, it) }
+                play.tracks?.subtitle?.let { putExtra(PlayerActivity.EXTRA_SUBTITLE_TRACK, it) }
+            }
         startActivity(intent)
     }
 
