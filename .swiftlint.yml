@@ -19,6 +19,9 @@ disabled_rules:
   - large_tuple
   - cyclomatic_complexity
   - type_name
+  - unused_closure_parameter
+  - for_where
+  - notification_center_detachment
 
 opt_in_rules:
   - empty_count

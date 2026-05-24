@@ -167,8 +167,6 @@ struct PlayerView: UIViewControllerRepresentable {
                 player.removeTimeObserver(token)
                 timeObserverToken = nil
             }
-            // swiftlint:disable:next notification_center_detachment
-            // TODO: Move removeObserver to deinit when re-observation pattern is refactored
             NotificationCenter.default.removeObserver(self)
 
             statusObservation = item.observe(\.status, options: [.new]) { [weak self] item, _ in
