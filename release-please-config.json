@@ -1,0 +1,28 @@
+{
+  "release-type": "simple",
+  "include-component-in-tag": false,
+  "bump-minor-pre-major": true,
+  "bump-patch-for-minor-pre-major": false,
+  "draft": false,
+  "prerelease": false,
+  "packages": {
+    ".": {
+      "release-type": "simple",
+      "extra-files": [
+        {
+          "type": "json",
+          "path": "worker/package.json",
+          "jsonpath": "$.version"
+        },
+        {
+          "type": "generic",
+          "path": "android/app/build.gradle.kts"
+        },
+        {
+          "type": "generic",
+          "path": "apple/CastTV/CastTV.xcodeproj/project.pbxproj"
+        }
+      ]
+    }
+  }
+}
