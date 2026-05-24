@@ -53,14 +53,8 @@ jobs:
         run: swiftlint --strict
 
       - name: Test CastTVShared
-        working-directory: apple/CastTV
-        run: |
-          xcodebuild test \
-            -project CastTV.xcodeproj \
-            -scheme CastTV-iOS \
-            -destination 'platform=iOS Simulator,name=iPhone 15' \
-            -only-testing:CastTVSharedTests \
-            CODE_SIGNING_ALLOWED=NO
+        working-directory: apple/CastTVShared
+        run: swift test
 
       - name: Build iOS
         working-directory: apple/CastTV
