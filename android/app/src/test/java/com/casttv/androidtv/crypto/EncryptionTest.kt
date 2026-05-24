@@ -6,7 +6,6 @@ import org.junit.Assert.assertNotEquals
 import org.junit.Test
 
 class EncryptionTest {
-
     @Test
     fun roundTripRecoversPlaintext() {
         val key = Encryption.generateKey()
