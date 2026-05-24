@@ -3,6 +3,7 @@
  *
  * Routes:
  *   GET  /                    — landing page
+ *   GET  /altstore.json       — AltStore source manifest (auto-derived from GH Releases)
  *   GET  /room/:code/status   — returns whether a TV is connected
  *   GET  /room/:code/ws       — upgrades to WebSocket, requires ?role=appletv|androidtv|iphone
  *
@@ -52,6 +53,11 @@ export default {
       return new Response(LANDING_PAGE_HTML, {
         headers: { "Content-Type": "text/html; charset=utf-8", ...corsHeaders },
       });
+    }
+
+    // Route: GET /altstore.json
+    if (path === "/altstore.json") {
+      return handleAltStoreSource(corsHeaders);
     }
 
     // Route: GET /room/:code/status
@@ -308,6 +314,69 @@ export class Room {
   }
 }
 
+/**
+ * Build an AltStore source manifest from the latest GitHub Release.
+ * Reads the iOS .ipa asset, returns a source pointing at it.
+ * Cached at the edge for 5 minutes to avoid hitting the GitHub API rate limit.
+ */
+async function handleAltStoreSource(corsHeaders) {
+  const cache = caches.default;
+  const cacheKey = new Request("https://cast.anandabadari.com/altstore.json");
+  const cached = await cache.match(cacheKey);
+  if (cached) return cached;
+
+  const ghResponse = await fetch("https://api.github.com/repos/abadari3/CastTV/releases/latest", {
+    headers: { "User-Agent": "casttv-worker", Accept: "application/vnd.github+json" },
+  });
+  if (!ghResponse.ok) {
+    return new Response(
+      JSON.stringify({ error: "Failed to fetch latest release", status: ghResponse.status }),
+      { status: 502, headers: { "Content-Type": "application/json", ...corsHeaders } }
+    );
+  }
+  const release = await ghResponse.json();
+  const iosAsset = release.assets?.find((a) => a.name === "CastTV-iOS.ipa");
+
+  const source = {
+    name: "CastTV",
+    identifier: "com.anandabadari.casttv.source",
+    sourceURL: "https://cast.anandabadari.com/altstore.json",
+    apps: iosAsset
+      ? [
+          {
+            name: "CastTV",
+            bundleIdentifier: "com.anandabadari.casttv",
+            developerName: "Anand Badari",
+            subtitle: "Cast any video URL to your Apple TV or Android TV",
+            version: release.tag_name.replace(/^v/, ""),
+            versionDate: release.published_at,
+            versionDescription: release.body || "",
+            downloadURL: iosAsset.browser_download_url,
+            localizedDescription:
+              "Cast video URLs to your Apple TV or Android TV. The iPhone is the remote. End-to-end encrypted (AES-256-GCM). No accounts, no sign-in. Pair by scanning a QR code; video streams direct from source to TV.",
+            iconURL:
+              "https://raw.githubusercontent.com/abadari3/CastTV/main/apple/CastTV/iOS/Assets.xcassets/AppIcon.appiconset/icon-1024.png",
+            tintColor: "0a7cff",
+            size: iosAsset.size,
+          },
+        ]
+      : [],
+  };
+
+  const response = new Response(JSON.stringify(source, null, 2), {
+    headers: {
+      "Content-Type": "application/json",
+      "Cache-Control": "public, max-age=300",
+      ...corsHeaders,
+    },
+  });
+  // Only cache when we actually have an iOS asset; avoids caching the empty case
+  if (iosAsset) {
+    await cache.put(cacheKey, response.clone());
+  }
+  return response;
+}
+
 const LANDING_PAGE_HTML = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -402,13 +471,17 @@ const LANDING_PAGE_HTML = `<!DOCTYPE html>
   <section>
     <h2>Download</h2>
     <div class="downloads">
-      <a class="btn" href="https://github.com/abadari3/CastTV/releases/latest">
-        <div class="btn-label">iPhone</div>
-        <div class="btn-sub">CastTV-iOS.ipa</div>
+      <a class="btn" href="altstore://source?url=https%3A%2F%2Fcast.anandabadari.com%2Faltstore.json">
+        <div class="btn-label">iPhone — AltStore</div>
+        <div class="btn-sub">Tap to add source &amp; install</div>
       </a>
-      <a class="btn" href="https://github.com/abadari3/CastTV/releases/latest">
+      <a class="btn" href="https://github.com/abadari3/CastTV/releases/latest/download/CastTV-iOS.ipa">
+        <div class="btn-label">iPhone — direct</div>
+        <div class="btn-sub">CastTV-iOS.ipa (sideload)</div>
+      </a>
+      <a class="btn" href="https://github.com/abadari3/CastTV/releases/latest/download/CastTV-tvOS.ipa">
         <div class="btn-label">Apple TV</div>
-        <div class="btn-sub">CastTV-tvOS.ipa</div>
+        <div class="btn-sub">CastTV-tvOS.ipa (sideload via Xcode)</div>
       </a>
       <a class="btn" href="https://github.com/abadari3/CastTV/releases/latest/download/CastTV-AndroidTV.apk">
         <div class="btn-label">Android TV</div>
