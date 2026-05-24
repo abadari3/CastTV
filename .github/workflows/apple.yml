@@ -129,19 +129,17 @@ jobs:
 
       - name: Package iOS IPA
         run: |
-          rm -rf Payload Payload-iOS
-          mkdir Payload-iOS
-          cp -r ios-app/* Payload-iOS/CastTV.app
-          mv Payload-iOS Payload
+          rm -rf Payload
+          mkdir Payload
+          cp -R ios-app/ Payload/CastTV.app
           zip -r CastTV-iOS.ipa Payload
           rm -rf Payload
 
       - name: Package tvOS IPA
         run: |
-          rm -rf Payload Payload-tvOS
-          mkdir Payload-tvOS
-          cp -r tvos-app/* Payload-tvOS/CastTV.app
-          mv Payload-tvOS Payload
+          rm -rf Payload
+          mkdir Payload
+          cp -R tvos-app/ Payload/CastTV.app
           zip -r CastTV-tvOS.ipa Payload
           rm -rf Payload
 
