@@ -7,6 +7,7 @@ zxing = "3.5.3"
 coroutines = "1.7.3"
 composeBom = "2024.02.00"
 ktlint = "12.1.1"
+junit = "4.13.2"
 [libraries]
 compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
 compose-ui = { group = "androidx.compose.ui", name = "ui" }
@@ -25,6 +26,7 @@ gson = { group = "com.google.code.gson", name = "gson", version = "2.10.1" }
 lifecycle-runtime = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version = "2.7.0" }
 lifecycle-viewmodel = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version = "2.7.0" }
 appcompat = { group = "androidx.appcompat", name = "appcompat", version = "1.6.1" }
+junit = { group = "junit", name = "junit", version.ref = "junit" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

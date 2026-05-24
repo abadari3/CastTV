@@ -78,4 +78,5 @@ dependencies {
     implementation(libs.lifecycle.runtime)
     implementation(libs.lifecycle.viewmodel)
     implementation(libs.appcompat)
+    testImplementation(libs.junit)
 }
