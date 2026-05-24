@@ -1,8 +1,7 @@
 included:
   - apple/CastTVShared/Sources
-  - apple/CastTV/CastTV-iOS
-  - apple/CastTV/CastTV-tvOS
-  - apple/CastTV/CastTV-Shared
+  - apple/CastTV/iOS
+  - apple/CastTV/tvOS
 
 excluded:
   - apple/CastTV/build
