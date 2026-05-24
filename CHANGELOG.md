@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.6](https://github.com/abadari3/CastTV/compare/v1.0.5...v1.0.6) (2026-05-24)
+
+
+### Bug Fixes
+
+* **ci:** correct iOS/tvOS IPA packaging command ([#16](https://github.com/abadari3/CastTV/issues/16)) ([fb698da](https://github.com/abadari3/CastTV/commit/fb698da97c967c4319d750ec7af2ba495a71df0d))
+
 ## [1.0.5](https://github.com/abadari3/CastTV/compare/v1.0.4...v1.0.5) (2026-05-24)
 
 
