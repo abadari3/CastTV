@@ -2,7 +2,7 @@
  * CastTV Cloudflare Worker
  *
  * Routes:
- *   GET  /download/android     — serves Android TV APK from R2
+ *   GET  /                    — landing page
  *   GET  /room/:code/status   — returns whether a TV is connected
  *   GET  /room/:code/ws       — upgrades to WebSocket, requires ?role=appletv|androidtv|iphone
  *
@@ -47,21 +47,10 @@ export default {
       return new Response(null, { status: 204, headers: corsHeaders });
     }
 
-    // Route: GET /download/android
-    if (path === "/download/android") {
-      const object = await env.ASSETS.get("android/casttv.apk");
-      if (!object) {
-        return new Response(JSON.stringify({ error: "APK not found" }), {
-          status: 404, headers: { "Content-Type": "application/json", ...corsHeaders },
-        });
-      }
-      return new Response(object.body, {
-        headers: {
-          "Content-Type": "application/vnd.android.package-archive",
-          "Content-Disposition": 'attachment; filename="CastTV.apk"',
-          "Content-Length": object.size,
-          ...corsHeaders,
-        },
+    // Route: GET /
+    if (path === "/") {
+      return new Response(LANDING_PAGE_HTML, {
+        headers: { "Content-Type": "text/html; charset=utf-8", ...corsHeaders },
       });
     }
 
@@ -298,3 +287,134 @@ export class Room {
     try { ws.close(1011, "WebSocket error"); } catch {}
   }
 }
+
+const LANDING_PAGE_HTML = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CastTV — Cast any video to your TV</title>
+<meta name="description" content="Cast video URLs from your iPhone to Apple TV or Android TV. End-to-end encrypted. No accounts.">
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #fff;
+    --fg: #111;
+    --muted: #666;
+    --border: #e5e5e5;
+    --accent: #0a7cff;
+    --code-bg: #f5f5f7;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0c0c0e;
+      --fg: #f5f5f7;
+      --muted: #9a9a9f;
+      --border: #2a2a2e;
+      --accent: #2f9bff;
+      --code-bg: #1a1a1d;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  main { max-width: 720px; margin: 0 auto; padding: 64px 24px 96px; }
+  header { text-align: center; margin-bottom: 56px; }
+  h1 { font-size: 56px; margin: 0 0 12px; letter-spacing: -0.03em; font-weight: 700; }
+  .tagline { font-size: 20px; color: var(--muted); margin: 0; }
+  h2 { font-size: 22px; margin: 48px 0 16px; letter-spacing: -0.01em; }
+  p { margin: 0 0 16px; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .downloads { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin: 16px 0 0; }
+  .btn {
+    display: block;
+    padding: 16px 20px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    color: var(--fg);
+    text-decoration: none;
+    transition: border-color 0.15s, transform 0.05s;
+  }
+  .btn:hover { border-color: var(--accent); text-decoration: none; }
+  .btn:active { transform: scale(0.98); }
+  .btn-label { font-weight: 600; font-size: 15px; }
+  .btn-sub { font-size: 13px; color: var(--muted); margin-top: 2px; }
+  ol { padding-left: 24px; }
+  ol li { margin-bottom: 8px; }
+  code { background: var(--code-bg); padding: 2px 6px; border-radius: 4px; font-size: 13px; font-family: ui-monospace, "SF Mono", Menlo, monospace; }
+  .diagram {
+    background: var(--code-bg);
+    border-radius: 12px;
+    padding: 20px;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 12px;
+    line-height: 1.5;
+    overflow-x: auto;
+    white-space: pre;
+    color: var(--muted);
+  }
+  footer { margin-top: 64px; padding-top: 24px; border-top: 1px solid var(--border); color: var(--muted); font-size: 14px; text-align: center; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>CastTV</h1>
+    <p class="tagline">Cast any video URL to your Apple TV or Android TV.</p>
+  </header>
+
+  <section>
+    <h2>How it works</h2>
+    <p>Your iPhone is the remote. Pair with a TV by scanning a QR code, paste a video URL, and the TV plays it directly from the source. Everything between your devices is end-to-end encrypted (AES-256-GCM). No accounts, no sign-in.</p>
+    <div class="diagram">iPhone ──encrypted WebSocket──&gt; relay &lt;──encrypted WebSocket── TV
+                                          │
+                                  video streams direct
+                                  from source to TV</div>
+  </section>
+
+  <section>
+    <h2>Download</h2>
+    <div class="downloads">
+      <a class="btn" href="https://github.com/abadari3/CastTV/releases/latest">
+        <div class="btn-label">iPhone</div>
+        <div class="btn-sub">CastTV-iOS.ipa</div>
+      </a>
+      <a class="btn" href="https://github.com/abadari3/CastTV/releases/latest">
+        <div class="btn-label">Apple TV</div>
+        <div class="btn-sub">CastTV-tvOS.ipa</div>
+      </a>
+      <a class="btn" href="https://github.com/abadari3/CastTV/releases/latest/download/CastTV-AndroidTV.apk">
+        <div class="btn-label">Android TV</div>
+        <div class="btn-sub">CastTV-AndroidTV.apk</div>
+      </a>
+    </div>
+  </section>
+
+  <section>
+    <h2>Pair a TV</h2>
+    <ol>
+      <li>Open CastTV on your TV — it displays a QR code.</li>
+      <li>Open CastTV on your iPhone — tap <strong>+</strong> and scan the QR code.</li>
+      <li>The TV appears in your iPhone's device list. Done.</li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>Compatibility</h2>
+    <p>Plays MP4, HLS, MKV, WebM, AVI. H.264, HEVC (incl. Dolby Vision), VP9, AV1 on Android. WebVTT, SRT, ASS, and PGS bitmap subtitles. Apple TV remuxes non-native containers on-device — video is always copied bit-for-bit, never transcoded.</p>
+    <p>Full compatibility tables on <a href="https://github.com/abadari3/CastTV#compatibility">GitHub</a>.</p>
+  </section>
+
+  <footer>
+    <a href="https://github.com/abadari3/CastTV">Source on GitHub</a>
+  </footer>
+</main>
+</body>
+</html>`;

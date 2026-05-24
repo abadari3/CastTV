@@ -131,9 +131,11 @@ Probes URLs (AVFoundation + FFmpeg fallback), shows track info with color-coded 
 
 Cloudflare Worker with Durable Objects. One Durable Object per room (per TV). Routes:
 
+- `GET /` — landing page
 - `GET /room/:code/status` — connection presence check
 - `GET /room/:code/ws?role=appletv|androidtv|iphone` — WebSocket relay
-- `GET /download/android` — APK download from R2
+
+The Android APK is served directly from GitHub Releases (`https://github.com/abadari3/CastTV/releases/latest/download/CastTV-AndroidTV.apk`).
 
 Room codes are 6 characters from `ABCDEFGHJKLMNPQRSTUVWXYZ23456789`. Rate-limited. Room code length validated server-side.
 

@@ -19,7 +19,7 @@ import okhttp3.WebSocketListener
 import java.util.concurrent.TimeUnit
 
 private const val TAG = "CastTV.WS"
-const val SERVER_BASE_URL = "wss://casttv-worker.77fnp5xdxv.workers.dev"
+const val SERVER_BASE_URL = "wss://cast.anandabadari.com"
 
 enum class ConnectionState { DISCONNECTED, CONNECTING, CONNECTED }
 

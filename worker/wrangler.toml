@@ -1,6 +1,12 @@
 name = "casttv-worker"
 main = "src/index.js"
 compatibility_date = "2024-12-01"
+account_id = "4298cb31061518145057ad2f6333063b"
+workers_dev = true
+
+routes = [
+  { pattern = "cast.anandabadari.com", custom_domain = true }
+]
 
 [[durable_objects.bindings]]
 name = "ROOM"
@@ -9,7 +15,3 @@ class_name = "Room"
 [[migrations]]
 tag = "v1"
 new_sqlite_classes = ["Room"]
-
-[[r2_buckets]]
-binding = "ASSETS"
-bucket_name = "casttv-assets"
