@@ -167,6 +167,9 @@ struct PlayerView: UIViewControllerRepresentable {
                 player.removeTimeObserver(token)
                 timeObserverToken = nil
             }
+            // Clear observers before re-observing a new player item — Coordinator
+            // is reused across plays. Genuine cleanup is in deinit.
+            // swiftlint:disable:next notification_center_detachment
             NotificationCenter.default.removeObserver(self)
 
             statusObservation = item.observe(\.status, options: [.new]) { [weak self] item, _ in

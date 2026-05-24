@@ -94,13 +94,7 @@ enum CapabilityDetector {
             atmosSupported = true
         }
 
-        var spatialAudioEnabled = false
-        for output in outputs {
-            if output.isSpatialAudioEnabled {
-                spatialAudioEnabled = true
-                break
-            }
-        }
+        let spatialAudioEnabled = outputs.contains { $0.isSpatialAudioEnabled }
 
         return AudioCapabilities(
             maxChannels: maxChannels,
