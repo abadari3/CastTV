@@ -93,7 +93,7 @@ final class LocalServer: @unchecked Sendable {
 
     private func receiveHTTPRequest(on connection: NWConnection) {
         // Read up to 8KB for HTTP request headers
-        connection.receive(minimumIncompleteLength: 1, maximumLength: 8192) { [weak self] data, _, isComplete, error in
+        connection.receive(minimumIncompleteLength: 1, maximumLength: 8192) { [weak self] data, _, _, error in
             guard let self, let data, error == nil else {
                 connection.cancel()
                 return
