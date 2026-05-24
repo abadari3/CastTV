@@ -18,6 +18,7 @@ disabled_rules:
   - todo
   - large_tuple
   - cyclomatic_complexity
+  - type_name
 
 opt_in_rules:
   - empty_count

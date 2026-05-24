@@ -1,7 +1,7 @@
-import SwiftUI
-import CryptoKit
 import CastTVShared
+import CryptoKit
 import os
+import SwiftUI
 
 private let logger = Logger(subsystem: "com.casttv.ios", category: "AppState")
 

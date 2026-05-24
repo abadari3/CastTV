@@ -1,6 +1,6 @@
-import Foundation
 import AVFoundation
 import FFmpegKit
+import Foundation
 import os
 
 private let logger = Logger(subsystem: "com.casttv.ios", category: "ProbeTest")
@@ -13,7 +13,7 @@ enum ProbeTest {
         let urls = [
             "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
             "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
-            "https://devstreaming-cdn.apple.com/videos/streaming/examples/adv_dv_atmos/main.m3u8",
+            "https://devstreaming-cdn.apple.com/videos/streaming/examples/adv_dv_atmos/main.m3u8"
         ]
 
         for urlString in urls {

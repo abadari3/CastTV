@@ -1,6 +1,6 @@
-import SwiftUI
 import CastTVShared
 import FFmpegKit
+import SwiftUI
 
 /// Combined home screen for tvOS.
 /// Left side: QR code for pairing. Right side: status + Enter URL.

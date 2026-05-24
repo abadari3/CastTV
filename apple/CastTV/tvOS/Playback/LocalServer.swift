@@ -1,6 +1,6 @@
+import CastTVShared
 import Foundation
 import Network
-import CastTVShared
 import os
 
 private let logger = Logger(subsystem: "com.casttv.tvos", category: "LocalServer")

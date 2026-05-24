@@ -1,5 +1,5 @@
-import SwiftUI
 import AVFoundation
+import SwiftUI
 
 struct QRScannerView: UIViewControllerRepresentable {
     let onCodeScanned: (String) -> Void
@@ -64,7 +64,7 @@ final class QRScannerViewController: UIViewController, AVCaptureMetadataOutputOb
         view.addSubview(label)
         NSLayoutConstraint.activate([
             label.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -40),
-            label.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            label.centerXAnchor.constraint(equalTo: view.centerXAnchor)
         ])
 
         DispatchQueue.global(qos: .userInitiated).async { [weak self] in
@@ -81,7 +81,7 @@ final class QRScannerViewController: UIViewController, AVCaptureMetadataOutputOb
         view.addSubview(label)
         NSLayoutConstraint.activate([
             label.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            label.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            label.centerYAnchor.constraint(equalTo: view.centerYAnchor)
         ])
     }
 

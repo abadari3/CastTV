@@ -1,5 +1,5 @@
-import SwiftUI
 import CastTVShared
+import SwiftUI
 
 struct DeviceRow: View {
     let device: PairedDevice

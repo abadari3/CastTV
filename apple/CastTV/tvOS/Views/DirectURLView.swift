@@ -1,6 +1,6 @@
-import SwiftUI
 import AVKit
 import CastTVShared
+import SwiftUI
 
 struct DirectURLView: View {
     @ObservedObject var appState: TVAppState

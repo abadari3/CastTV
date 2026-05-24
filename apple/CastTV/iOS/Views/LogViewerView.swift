@@ -1,12 +1,12 @@
-import SwiftUI
 import CastTVShared
+import SwiftUI
 
 struct LogViewerView: View {
     let device: PairedDevice
     @ObservedObject var appState: iOSAppState
     @State private var logs: [LogMessage] = []
     @State private var historyLogs: [LogMessage] = []
-    @State private var filterLevel: LogLevel? = nil
+    @State private var filterLevel: LogLevel?
     @State private var isConnected = false
     @State private var webSocket: WebSocketClient?
 

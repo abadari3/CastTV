@@ -1,5 +1,5 @@
-import SwiftUI
 import CastTVShared
+import SwiftUI
 
 struct HistoryCard: View {
     let entry: URLHistoryEntry

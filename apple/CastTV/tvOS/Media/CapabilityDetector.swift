@@ -1,7 +1,7 @@
-import Foundation
 import AVFoundation
-import UIKit
 import CastTVShared
+import Foundation
+import UIKit
 
 enum CapabilityDetector {
 

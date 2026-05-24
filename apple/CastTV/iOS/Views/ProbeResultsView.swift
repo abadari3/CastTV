@@ -1,5 +1,5 @@
-import SwiftUI
 import CastTVShared
+import SwiftUI
 
 struct ProbeResultsView: View {
     let result: ProbeResult

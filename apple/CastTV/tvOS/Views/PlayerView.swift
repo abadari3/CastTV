@@ -1,6 +1,6 @@
-import SwiftUI
 import AVKit
 import CastTVShared
+import SwiftUI
 import UIKit
 
 struct PlayerView: UIViewControllerRepresentable {
@@ -167,6 +167,8 @@ struct PlayerView: UIViewControllerRepresentable {
                 player.removeTimeObserver(token)
                 timeObserverToken = nil
             }
+            // swiftlint:disable:next notification_center_detachment
+            // TODO: Move removeObserver to deinit when re-observation pattern is refactored
             NotificationCenter.default.removeObserver(self)
 
             statusObservation = item.observe(\.status, options: [.new]) { [weak self] item, _ in
@@ -296,13 +298,13 @@ struct PlayerView: UIViewControllerRepresentable {
                 hostingVC.view.topAnchor.constraint(equalTo: overlayContainer.topAnchor),
                 hostingVC.view.bottomAnchor.constraint(equalTo: overlayContainer.bottomAnchor),
                 hostingVC.view.leadingAnchor.constraint(equalTo: overlayContainer.leadingAnchor),
-                hostingVC.view.trailingAnchor.constraint(equalTo: overlayContainer.trailingAnchor),
+                hostingVC.view.trailingAnchor.constraint(equalTo: overlayContainer.trailingAnchor)
             ])
             hostingVC.didMove(toParent: vc)
             pgsOverlayVC = hostingVC
 
             // Start time observer to update subtitle image
-            var currentIndex: Int? = nil
+            var currentIndex: Int?
             let interval = CMTime(seconds: 0.1, preferredTimescale: 600)
             pgsTimeObserverToken = player.addPeriodicTimeObserver(forInterval: interval, queue: .main) { [weak self, weak hostingVC] time in
                 guard let self, let hostingVC else { return }
