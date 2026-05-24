@@ -140,8 +140,8 @@ public final class CastTVLogger: @unchecked Sendable {
     }
 
     private func writeToFile(_ entry: LogEntry) {
-        guard let data = try? JSONEncoder().encode(entry),
-              let newline = "\n".data(using: .utf8) else { return }
+        guard let data = try? JSONEncoder().encode(entry) else { return }
+        let newline = Data("\n".utf8)
         lock.lock()
         fileHandle?.write(data)
         fileHandle?.write(newline)

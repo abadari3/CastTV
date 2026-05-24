@@ -5,9 +5,13 @@
   "type": "module",
   "scripts": {
     "dev": "wrangler dev",
-    "deploy": "wrangler deploy"
+    "deploy": "wrangler deploy",
+    "test": "node --test test/",
+    "lint": "prettier --check --no-error-on-unmatched-pattern 'src/**/*.{js,mjs}' 'test/**/*.{js,mjs}' package.json",
+    "format": "prettier --write --no-error-on-unmatched-pattern 'src/**/*.{js,mjs}' 'test/**/*.{js,mjs}' package.json"
   },
   "devDependencies": {
+    "prettier": "^3.3.0",
     "wrangler": "^4.0.0"
   }
 }

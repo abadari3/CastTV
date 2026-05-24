@@ -1,5 +1,5 @@
-import Foundation
 import CryptoKit
+import Foundation
 
 /// AES-GCM encryption/decryption for end-to-end encrypted messaging.
 public enum Encryption {

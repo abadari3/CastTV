@@ -188,4 +188,3 @@ public struct LogsHistoryMessage: Codable, Sendable {
         self.entries = entries
     }
 }
-

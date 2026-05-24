@@ -1,5 +1,5 @@
-import Foundation
 import AVFoundation
+import Foundation
 
 /// Shared AVFoundation-based media probing logic used by both iOS and tvOS.
 public enum AVProber {

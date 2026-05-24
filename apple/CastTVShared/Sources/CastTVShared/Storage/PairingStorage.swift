@@ -1,5 +1,5 @@
-import Foundation
 import CryptoKit
+import Foundation
 
 /// Persisted info about a paired TV (stored in UserDefaults).
 public struct PairedDevice: Codable, Identifiable, Hashable, Sendable {

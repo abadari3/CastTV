@@ -1,5 +1,5 @@
-import Foundation
 import CryptoKit
+import Foundation
 import os
 
 private let wsLogger = Logger(subsystem: "com.casttv.shared", category: "WebSocket")

@@ -1,6 +1,6 @@
+import CryptoKit
 import Foundation
 import Security
-import CryptoKit
 
 /// Simple Keychain wrapper for storing encryption keys.
 public enum KeychainHelper {
@@ -15,7 +15,7 @@ public enum KeychainHelper {
         let deleteQuery: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: service,
-            kSecAttrAccount as String: roomCode,
+            kSecAttrAccount as String: roomCode
         ]
         SecItemDelete(deleteQuery as CFDictionary)
 
@@ -24,7 +24,7 @@ public enum KeychainHelper {
             kSecAttrService as String: service,
             kSecAttrAccount as String: roomCode,
             kSecValueData as String: keyData,
-            kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlock,
+            kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlock
         ]
 
         let status = SecItemAdd(addQuery as CFDictionary, nil)
@@ -40,7 +40,7 @@ public enum KeychainHelper {
             kSecAttrService as String: service,
             kSecAttrAccount as String: roomCode,
             kSecReturnData as String: true,
-            kSecMatchLimit as String: kSecMatchLimitOne,
+            kSecMatchLimit as String: kSecMatchLimitOne
         ]
 
         var result: AnyObject?
@@ -57,7 +57,7 @@ public enum KeychainHelper {
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: service,
-            kSecAttrAccount as String: roomCode,
+            kSecAttrAccount as String: roomCode
         ]
         SecItemDelete(query as CFDictionary)
     }

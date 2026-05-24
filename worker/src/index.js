@@ -11,7 +11,7 @@
 
 // In-memory rate limit (resets on cold start — defense-in-depth only)
 const statusRateLimit = new Map(); // IP -> { count, resetAt }
-const STATUS_RATE_LIMIT = 30;     // max requests per window
+const STATUS_RATE_LIMIT = 30; // max requests per window
 const STATUS_RATE_WINDOW = 60000; // 1 minute
 
 function checkStatusRateLimit(ip) {
@@ -58,17 +58,17 @@ export default {
     const statusMatch = path.match(/^\/room\/([A-Za-z0-9]+)\/status$/);
     if (statusMatch) {
       if (statusMatch[1].length !== 6) {
-        return new Response(
-          JSON.stringify({ error: "Invalid room code" }),
-          { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
-        );
+        return new Response(JSON.stringify({ error: "Invalid room code" }), {
+          status: 400,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        });
       }
       const ip = request.headers.get("CF-Connecting-IP") || "unknown";
       if (!checkStatusRateLimit(ip)) {
-        return new Response(
-          JSON.stringify({ error: "Too many requests" }),
-          { status: 429, headers: { "Content-Type": "application/json", "Retry-After": "60", ...corsHeaders } }
-        );
+        return new Response(JSON.stringify({ error: "Too many requests" }), {
+          status: 429,
+          headers: { "Content-Type": "application/json", "Retry-After": "60", ...corsHeaders },
+        });
       }
       const code = statusMatch[1].toUpperCase();
       const roomId = env.ROOM.idFromName(code);
@@ -84,41 +84,46 @@ export default {
     const wsMatch = path.match(/^\/room\/([A-Za-z0-9]+)\/ws$/);
     if (wsMatch) {
       if (wsMatch[1].length !== 6) {
-        return new Response(
-          JSON.stringify({ error: "Invalid room code" }),
-          { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
-        );
+        return new Response(JSON.stringify({ error: "Invalid room code" }), {
+          status: 400,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        });
       }
       const code = wsMatch[1].toUpperCase();
       const role = url.searchParams.get("role");
 
       if (!role || !["appletv", "androidtv", "iphone"].includes(role)) {
         return new Response(
-          JSON.stringify({ error: "Missing or invalid role parameter. Use ?role=appletv, ?role=androidtv, or ?role=iphone" }),
+          JSON.stringify({
+            error:
+              "Missing or invalid role parameter. Use ?role=appletv, ?role=androidtv, or ?role=iphone",
+          }),
           { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
         );
       }
 
       if (request.headers.get("Upgrade") !== "websocket") {
-        return new Response(
-          JSON.stringify({ error: "Expected WebSocket upgrade" }),
-          { status: 426, headers: { "Content-Type": "application/json", ...corsHeaders } }
-        );
+        return new Response(JSON.stringify({ error: "Expected WebSocket upgrade" }), {
+          status: 426,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        });
       }
 
       const roomId = env.ROOM.idFromName(code);
       const room = env.ROOM.get(roomId);
       // Forward the request with role info
       const roomUrl = new URL(`http://internal/ws?role=${role}`);
-      return room.fetch(new Request(roomUrl, {
-        headers: request.headers,
-      }));
+      return room.fetch(
+        new Request(roomUrl, {
+          headers: request.headers,
+        })
+      );
     }
 
-    return new Response(
-      JSON.stringify({ error: "Not found" }),
-      { status: 404, headers: { "Content-Type": "application/json", ...corsHeaders } }
-    );
+    return new Response(JSON.stringify({ error: "Not found" }), {
+      status: 404,
+      headers: { "Content-Type": "application/json", ...corsHeaders },
+    });
   },
 };
 
@@ -186,17 +191,19 @@ export class Room {
   handleWebSocket(request, url) {
     const role = url.searchParams.get("role");
     const connections = this.getConnections();
-    console.log(`handleWebSocket: role=${role}, existing connections: ${connections.size} (${[...connections.values()].map(m => m.role).join(", ")})`);
+    console.log(
+      `handleWebSocket: role=${role}, existing connections: ${connections.size} (${[...connections.values()].map((m) => m.role).join(", ")})`
+    );
 
     // Room code collision check: reject if a TV is already connected
     // and another TV tries to join
     if (role === "appletv" || role === "androidtv") {
       for (const [, meta] of connections) {
         if (meta.role === "appletv" || meta.role === "androidtv") {
-          return new Response(
-            JSON.stringify({ error: "Room already has a TV connected" }),
-            { status: 409, headers: { "Content-Type": "application/json" } }
-          );
+          return new Response(JSON.stringify({ error: "Room already has a TV connected" }), {
+            status: 409,
+            headers: { "Content-Type": "application/json" },
+          });
         }
       }
     }
@@ -213,7 +220,9 @@ export class Room {
       timestamp: new Date().toISOString(),
     });
     for (const [ws] of connections) {
-      try { ws.send(joinMsg); } catch {}
+      try {
+        ws.send(joinMsg);
+      } catch {}
     }
 
     return new Response(null, { status: 101, webSocket: client });
@@ -222,8 +231,11 @@ export class Room {
   async webSocketMessage(ws, message) {
     const connections = this.getConnections();
     const senderMeta = connections.get(ws);
-    const msgPreview = typeof message === "string" ? message.substring(0, 50) : `[binary ${message.byteLength}b]`;
-    console.log(`webSocketMessage from ${senderMeta?.role || "unknown"}: ${msgPreview}... (${connections.size} connections)`);
+    const msgPreview =
+      typeof message === "string" ? message.substring(0, 50) : `[binary ${message.byteLength}b]`;
+    console.log(
+      `webSocketMessage from ${senderMeta?.role || "unknown"}: ${msgPreview}... (${connections.size} connections)`
+    );
 
     if (!senderMeta) {
       console.log("webSocketMessage: sender not found in connections, dropping");
@@ -259,12 +271,16 @@ export class Room {
       });
       for (const [otherWs] of connections) {
         if (otherWs !== ws) {
-          try { otherWs.send(leaveMsg); } catch {}
+          try {
+            otherWs.send(leaveMsg);
+          } catch {}
         }
       }
     }
 
-    try { ws.close(code, reason); } catch {}
+    try {
+      ws.close(code, reason);
+    } catch {}
   }
 
   async webSocketError(ws, error) {
@@ -279,12 +295,16 @@ export class Room {
       });
       for (const [otherWs] of connections) {
         if (otherWs !== ws) {
-          try { otherWs.send(leaveMsg); } catch {}
+          try {
+            otherWs.send(leaveMsg);
+          } catch {}
         }
       }
     }
 
-    try { ws.close(1011, "WebSocket error"); } catch {}
+    try {
+      ws.close(1011, "WebSocket error");
+    } catch {}
   }
 }
 

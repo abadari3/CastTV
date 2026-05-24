@@ -1,5 +1,5 @@
-import Foundation
 import CryptoKit
+import Foundation
 
 /// A history entry with optional metadata from probing.
 /// Cover art is stored on disk, not in UserDefaults.

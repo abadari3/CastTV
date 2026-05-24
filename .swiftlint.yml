@@ -1,0 +1,31 @@
+included:
+  - apple/CastTVShared/Sources
+  - apple/CastTV/CastTV-iOS
+  - apple/CastTV/CastTV-tvOS
+  - apple/CastTV/CastTV-Shared
+
+excluded:
+  - apple/CastTV/build
+  - apple/FFmpegKit
+  - .build
+
+disabled_rules:
+  - line_length
+  - file_length
+  - function_body_length
+  - type_body_length
+  - identifier_name
+  - nesting
+  - todo
+  - large_tuple
+  - cyclomatic_complexity
+
+opt_in_rules:
+  - empty_count
+  - sorted_imports
+  - explicit_init
+  - redundant_nil_coalescing
+  - first_where
+  - last_where
+
+reporter: "github-actions-logging"

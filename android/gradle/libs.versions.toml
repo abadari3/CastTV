@@ -6,6 +6,7 @@ okhttp = "4.12.0"
 zxing = "3.5.3"
 coroutines = "1.7.3"
 composeBom = "2024.02.00"
+ktlint = "12.1.1"
 [libraries]
 compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
 compose-ui = { group = "androidx.compose.ui", name = "ui" }
@@ -29,3 +30,4 @@ appcompat = { group = "androidx.appcompat", name = "appcompat", version = "1.6.1
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint" }
