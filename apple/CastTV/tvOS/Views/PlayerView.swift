@@ -85,7 +85,7 @@ struct PlayerView: UIViewControllerRepresentable {
                     }
                     if let dir = storageDir,
                        let content = try? String(contentsOf: dir.appendingPathComponent("stream.m3u8")),
-                       content.contains(".ts") {
+                       content.contains(".m4s") {
                         CastTVLogger.shared.info("HLS ready after \(Double(i) * 0.5)s, starting playback")
                         found = true
                         break

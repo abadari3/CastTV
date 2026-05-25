@@ -3,7 +3,7 @@ import os
 
 private let logger = Logger(subsystem: "com.casttv.tvos", category: "SegmentStorage")
 
-/// Manages temporary .ts segment files and subtitle files on disk.
+/// Manages temporary .m4s segment files (fMP4) and subtitle files on disk.
 ///
 /// Handles writing new segments, reading them for serving, and cleaning up
 /// old segments outside the sliding window.
@@ -28,7 +28,7 @@ final class SegmentStorage: @unchecked Sendable {
     /// Write a segment file. Returns the filename.
     @discardableResult
     func writeSegment(index: Int, data: Data) throws -> String {
-        let filename = "segment_\(index).ts"
+        let filename = "segment_\(index).m4s"
         let path = directory.appendingPathComponent(filename)
         try data.write(to: path)
 
@@ -67,7 +67,7 @@ final class SegmentStorage: @unchecked Sendable {
         let allFiles = segmentFiles
         lock.unlock()
 
-        let currentFilenames = Set(currentIndices.map { "segment_\($0).ts" })
+        let currentFilenames = Set(currentIndices.map { "segment_\($0).m4s" })
         let toRemove = allFiles.subtracting(currentFilenames)
 
         for filename in toRemove {
@@ -97,9 +97,11 @@ final class SegmentStorage: @unchecked Sendable {
             try? FileManager.default.removeItem(at: path)
         }
 
-        // Remove playlist files
+        // Remove playlist + fMP4 init files (FFmpeg rewrites init.mp4 on next start)
         let playlistPath = directory.appendingPathComponent("stream.m3u8")
         try? FileManager.default.removeItem(at: playlistPath)
+        let initPath = directory.appendingPathComponent("init.mp4")
+        try? FileManager.default.removeItem(at: initPath)
 
         logger.notice("Removed HLS segments and playlists")
     }
