@@ -7,7 +7,7 @@ private let logger = Logger(subsystem: "com.casttv.tvos", category: "RemuxServic
 
 /// Coordinates the full remux pipeline: FFmpeg demux -> segment files -> HTTP server -> AVPlayer.
 ///
-/// FFmpeg's HLS muxer produces stream.m3u8 + segment_N.ts files in a temp directory.
+/// FFmpeg's HLS muxer produces stream.m3u8 + init.mp4 + segment_N.m4s files in a temp directory.
 /// The local HTTP server serves those files directly to AVPlayer.
 @MainActor
 final class RemuxService: ObservableObject {
@@ -285,7 +285,7 @@ final class RemuxService: ObservableObject {
     // MARK: - HTTP Request Handler
 
     /// Serves files directly from the temp directory.
-    /// FFmpeg's HLS muxer produces stream.m3u8 + segment_N.ts files.
+    /// FFmpeg's HLS muxer produces stream.m3u8 + init.mp4 + segment_N.m4s (fMP4).
     private static nonisolated func handleRequest(path: String, storage: SegmentStorage) -> (Int, String, Data) {
         let cleanPath = path.components(separatedBy: "?").first ?? path
         let filename = String(cleanPath.dropFirst()) // remove leading /
@@ -297,6 +297,8 @@ final class RemuxService: ObservableObject {
         let contentType: String
         if filename.hasSuffix(".m3u8") {
             contentType = "application/vnd.apple.mpegurl"
+        } else if filename.hasSuffix(".m4s") || filename.hasSuffix(".mp4") {
+            contentType = "video/mp4"
         } else if filename.hasSuffix(".ts") {
             contentType = "video/mp2t"
         } else if filename.hasSuffix(".vtt") {

@@ -149,7 +149,8 @@ public final class FFRemuxer: @unchecked Sendable {
 
         // 2. Open HLS output
         let hlsPath = (config.outputDirectory as NSString).appendingPathComponent("stream.m3u8")
-        let segmentPattern = (config.outputDirectory as NSString).appendingPathComponent("segment_%d.ts")
+        let segmentPattern = (config.outputDirectory as NSString).appendingPathComponent("segment_%d.m4s")
+        let initSegmentPath = (config.outputDirectory as NSString).appendingPathComponent("init.mp4")
 
         var outputCtx: UnsafeMutablePointer<AVFormatContext>?
         ret = avformat_alloc_output_context2(&outputCtx, nil, "hls", hlsPath)
@@ -157,8 +158,14 @@ public final class FFRemuxer: @unchecked Sendable {
             throw RemuxError.openOutputFailed(ffmpegError(ret))
         }
 
-        // Configure HLS muxer options
+        // Configure HLS muxer options.
+        // fMP4 (not MPEG-TS) is required for HEVC HDR content to decode correctly
+        // in AVPlayer; MPEG-TS technically carries HEVC but Apple's decoder often
+        // fails silently on HEVC HDR wrapped in MPEG-TS (no video, audio only).
         var opts: OpaquePointer?
+        av_dict_set(&opts, "hls_segment_type", "fmp4", 0)
+        av_dict_set(&opts, "hls_fmp4_init_filename", "init.mp4", 0)
+        _ = initSegmentPath // referenced for clarity; FFmpeg writes init.mp4 alongside segments
         av_dict_set(&opts, "hls_time", "\(config.segmentDuration)", 0)
         av_dict_set(&opts, "hls_segment_filename", segmentPattern, 0)
         av_dict_set(&opts, "hls_flags", "independent_segments+delete_segments", 0)
